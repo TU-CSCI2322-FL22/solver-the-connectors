@@ -4,7 +4,7 @@ import Data.List
 --Written by MTP below
 
 data Board = Board [Column] Heights deriving (Show, Eq) --[Columns] and list of lengths of the columns
-data Color = Red | Black | Empty deriving (Show, Eq )
+data Color = Red | Black deriving (Show, Eq )
 type Heights = [(Int, Int)]
 type Column = [Spot]
 type Spot = (Coordinate, Color)
