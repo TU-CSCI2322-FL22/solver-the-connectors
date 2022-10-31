@@ -13,7 +13,7 @@ type Coordinate = (Int, Int) -- (row, column)
 rows = 6
 columns = 7
 
-InitialBoard = Board [[] | x <- [1..columns]] [(x,0) | x <- [1..rows]]-- Board [[],[],[],[],[],[],[]] [(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0)]
+initialBoard = Board [[] | x <- [1..columns]] [(x,0) | x <- [1..rows]]-- Board [[],[],[],[],[],[],[]] [(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0)]
 
 availableMoves :: Board -> [Int]
 availableMoves Board b h = [idx | (idx, cnt) <- h, cnt < row]
