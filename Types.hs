@@ -2,11 +2,18 @@ module Board where
 import Data.List
 
 ------------------------------------------MILESTONE ONE-----------------------------------------------
+{-For this milestone, you will need to be able to represent the board game in Haskell, make moves on 
+the board game, and tell if a player has won the board game. -}
 
 --Written by MTP below
 
 data Board = Board [Column] Heights deriving (Show, Eq) --[Columns] and list of lengths of the columns
-data Color = Red | Black deriving (Show, Eq )
+--create an instance of Show for Board to show the current game state
+data Color = Red | Black deriving (Show, Eq)
+instance Show Color where
+    show (Red) = "0"
+    show(Black) = "X"
+    
 type Heights = [(Int, Int)]
 type Column = [Spot]
 type Spot = (Coordinate, Color)
@@ -20,6 +27,8 @@ initialBoard = Board [[] | x <- [1..columns]] [(x,0) | x <- [1..rows]]-- Board [
 availableMoves :: Board -> [Int]
 availableMoves Board b h = [idx | (idx, cnt) <- h, cnt < row]
 
+updateBoard :: Board -> Int -> Int -> Board
+updateBoard (Board (x:xs) hg) ct cl = if ct == cl then (,):x
 addMove :: Board -> Int -> Board
 addMove (Board bd h) col = 
     let hghts [if (idx == col) then (idx, cnt+1) else (idx, cnt)| (idx,cnt) <- h]
