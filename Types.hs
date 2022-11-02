@@ -30,32 +30,37 @@ availableMoves (Board (c:cs) clr) lst cnt =
     else (availableMoves (Board cs clr) (lst) (cnt+1))
 
 updateBoard :: Board -> Move -> Maybe Board
-updateBoard (Board (x:xs) clr) col = --if () then Nothing else Just ...
+updateBoard (Board (x:xs) clr) col = undefined --if () then Nothing else Just ...
 
 winnerRow :: Board -> (Color, Bool)
 winnerRow = undefined
 
+
 winnerColumn :: Board -> (Color, Bool)
-winnerColumn [] = (Neither, False) 
-winnerColumn (b:bs) = 
-    let helperresult = helperColumn b;
-    in if (snd (helperColumn b) == True) then helperresult else winnerColumn bs
+winnerColumn (Board [] colr) = (Neither, False) 
+winnerColumn (Board (b:bs) colr) = 
+    let helperresult = aux b;
+    in if (snd (helperresult) == True) then helperresult else winnerColumn (Board bs colr)
     where aux lst = 
-        let grouped = group lst
-            fourcolor = [head x | x <- grouped, (length x) >= 4]
-        in if fourcolor == [] then (Neither, False) else (head fourcolor, True)
+                let grouped = group lst
+                    fourcolor = [head x | x <- grouped, (length x) >= 4]
+                in if fourcolor == [] then (Neither, False) else (head fourcolor, True)
 
 winnerDiagonalAsc :: Board -> (Color, Bool)
-winnerDiagonal = undefined 
+winnerDiagonalAsc = undefined 
 
 winnerDiagonalDes :: Board -> (Color, Bool)
-winnerDiagonal = undefined 
+winnerDiagonalDes = undefined 
 
 isWinner :: Board -> Maybe Color --returns the Color and True if there is a a winner, so that we know which player won. 
-isWinner bd = snd (winnerColumn bd) | snd (winnerRow bd) | snd (winnerDiagonalAsc bd) | snd (winnerDiagonalDes bd)
+isWinner bd = undefined --snd (winnerColumn bd) | snd (winnerRow bd) | snd (winnerDiagonalAsc bd) | snd (winnerDiagonalDes bd)
 --Data type for outcome to check if tie
 --
 --Written by MTP above
 
 --We will additonally need "A pretty show function for a game state, to ease debugging."
---Full Credit: All of these functions should consider possible errors or edge cases: what if there no winner, what if the move is not legal for the current game, etc. Use Maybe's or Either's appropriately.
+--Full Credit: All of these functions should consider possible errors or edge cases: what if there no winner, what if the move is not legal for the current game, etc. Use Maybe's or Either's appropriately.--
+
+--TESTER CODE--
+testWC = winnerColumn (Board [[Red, Black, Red, Black, Black, Red], [Red, Black, Black, Black, Black, Red], [Black, Red, Black, Red, Red, Black]] Red) --WORKS
+testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) [] 1 --WORKS
