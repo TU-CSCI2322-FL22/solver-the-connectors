@@ -7,17 +7,12 @@ the board game, and tell if a player has won the board game. -}
 
 --Written by MTP below
 
-data Board = Board [Column] Color deriving (Show, Eq) --[Columns] and list of lengths of the columns
+data Board = Board [Column] Color deriving (Show, Eq) --[Columns] and Color of player currently making move
 --create an instance of Show for Board to show the current game state
-data Color = Red | Black deriving (Show, Eq)
+data Color = Red | Black | Neither deriving (Show, Eq)
 showcolor (Red) = "0"
 showColor (Black) = "X"
-    
---type Heights = [(Int, Int)]
-type Column = (Int,[Color])
-
---type Spot = (Coordinate, Color)
---type Coordinate = (Int, Int) -- (row, column)
+type Column = [Color]
 type Move = Int
 
 rows = 6
@@ -26,30 +21,38 @@ columns = 7
 -- Used to keep track of what level we are making our move on; SC
 --colCounter = [ [(x,1)] | x <- [1..columns] ] 
 
-initialBoard = Board [[] | x <- [1..columns]] [(x,0) | x <- [1..rows]]-- Board [[],[],[],[],[],[],[]] [(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0)]
+initialBoard = Board [[] | x <- [1..columns]] Red -- Board [[],[],[],[],[],[],[]] Red
 
-availableMoves :: Board -> [Int]
-availableMoves Board b h = [idx | (idx, cnt) <- h, cnt < row]
+availableMoves :: Board -> [Move] -> Int -> [Move] -- Board -> [initially empty move lst] -> (index count) -> [resulting move lst]
+availableMoves (Board [] clr) lst cnt = lst
+availableMoves (Board (c:cs) clr) lst cnt =  
+    if (length c < 6) then (availableMoves (Board cs clr) (cnt:lst) (cnt+1)) 
+    else (availableMoves (Board cs clr) (lst) (cnt+1))
 
-updateBoard :: Board -> Int -> Int -> Board
-updateBoard (Board (x:xs) hg) ct cl = if ct == cl then (,):x
-addMove :: Board -> Int -> Maybe Board
-addMove (Board bd h) col = 
-    let hghts [if (idx == col) then (idx, cnt+1) else (idx, cnt)| (idx,cnt) <- h]
-        bord = --[if(col == idx) then ]
-    in Board bord hghts
+updateBoard :: Board -> Move -> Maybe Board
+updateBoard (Board (x:xs) clr) col = --if () then Nothing else Just ...
 
 winnerRow :: Board -> (Color, Bool)
 winnerRow = undefined
 
 winnerColumn :: Board -> (Color, Bool)
-winnerColumn = undefined
+winnerColumn [] = (Neither, False) 
+winnerColumn (b:bs) = 
+    let helperresult = helperColumn b;
+    in if (snd (helperColumn b) == True) then helperresult else winnerColumn bs
+    where aux lst = 
+        let grouped = group lst
+            fourcolor = [head x | x <- grouped, (length x) >= 4]
+        in if fourcolor == [] then (Neither, False) else (head fourcolor, True)
 
-winnerDiagonal :: Board -> (Color, Bool)
+winnerDiagonalAsc :: Board -> (Color, Bool)
+winnerDiagonal = undefined 
+
+winnerDiagonalDes :: Board -> (Color, Bool)
 winnerDiagonal = undefined 
 
 isWinner :: Board -> Maybe Color --returns the Color and True if there is a a winner, so that we know which player won. 
-isWinner bd = snd (winnerColumn bd) | snd (winnerRow bd) | snd (winnerDiagonal bd)
+isWinner bd = snd (winnerColumn bd) | snd (winnerRow bd) | snd (winnerDiagonalAsc bd) | snd (winnerDiagonalDes bd)
 --Data type for outcome to check if tie
 --
 --Written by MTP above
