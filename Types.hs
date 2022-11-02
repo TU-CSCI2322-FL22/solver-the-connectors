@@ -23,7 +23,7 @@ rows = 6
 columns = 7
 
 -- Used to keep track of what level we are making our move on; SC
-colCounter = [ [(x,1)] | x <- [1..columns] ] 
+--colCounter = [ [(x,1)] | x <- [1..columns] ] 
 
 initialBoard = Board [[] | x <- [1..columns]] [(x,0) | x <- [1..rows]]-- Board [[],[],[],[],[],[],[]] [(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0)]
 
