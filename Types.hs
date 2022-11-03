@@ -58,10 +58,12 @@ availableMoves brd =
 --make sure when you call updateBoard passing in a 0 for count initially 
 updateBoard :: Board -> Move -> Int -> [Column] -> Board
 updateBoard (Board (x:xs) clr) mv cnt accumlst = 
-    if (cnt == mv) then Board ((accumlst ++ (x:clr) ++ xs) switchColor(clr)) 
-    else updateBoard (Board xs switchColor(clr)) mv (cnt+1) (x:accumlst)
+    let newcolor = if clr == Red then Black else Red
+    in if (cnt == mv) then (Board (accumlst ++ (clr:x):xs) newcolor)
+       else updateBoard (Board xs clr) mv (cnt+1) (x:accumlst)
 
-{-updateBoard b@(Board (x:xs) clr) mv = 
+ub = updateBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 1 0 []
+{-updateBoard b@(Board (x:xs) clr) mv =
     if mv `elem` (availableMoves b)
     then
          aux (Board (x:xs) clr) mv mv = 
@@ -70,10 +72,10 @@ updateBoard (Board (x:xs) clr) mv cnt accumlst =
         else -}
         
     
-switchColor :: Color -> Color
+{-switchColor :: Color -> Color
 switchColor clr
     | clr == Black = Red
-    | clr == Red = Black
+    | clr == Red = Black-}
 --if clr == Black then clr = Red else clr = Black
 --if () then Nothing else Just ...
 
@@ -104,7 +106,7 @@ winnerDiagonalAsc = undefined
 winnerDiagonalDes :: Board -> (Color, Bool)
 winnerDiagonalDes = undefined -}
 
-getColumn :: Board -> Move -> Row
+{-getColumn :: Board -> Move -> Int
 getColumn (Board cols clr) mv = 
         let
             drC = drop (m - 1) cols
@@ -125,9 +127,9 @@ findColor (Board bd clr) (x,y) =
         if beforein == Neither 
         then Neither 
         else (if drop(x-1) col == [] then Neither else head (drop (x - 1) col))
+-}
 
-
-leftAsc :: Board -> Color -> (Int, Int) -> Int -> Int --Board -> Color -> Move -> Count ->4 FinalCount
+{-leftAsc :: Board -> Color -> (Int, Int) -> Int -> Int --Board -> Color -> Move -> Count ->4 FinalCount
 leftAsc (Board cols clr) mv 4 = 4
 leftAsc (Board cols clr) mv cnt = undefined
 
@@ -177,3 +179,4 @@ isWinner (Board cols clr) mv =
 --TESTER CODE--
 --testWC = winnerColumn (Board [[Red, Black, Red, Black, Black, Red], [Red, Black, Black, Black, Black, Red], [Black, Red, Black, Red, Red, Black]] Red) --WORKS
 testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) --WORKS
+-}
