@@ -25,6 +25,7 @@ type Move = Int
 type State = (Board, Color)
 --state of the board, where the color represents the winner if there is one 
 -- A little superfluous but we'll see.
+type Coordinat3e = (Int, Int)
 
 showcolor (Red) = "0"
 showColor (Black) = "X"
@@ -59,7 +60,7 @@ makeMove :: Board -> Move -> Board
 makeMove = undefined --if move `elem` availableMoves brd then else return error
 --If we check if it's a valid move before, do we need a Maybe Board? TBH I still don't really understand
 --Maybe. I think it would elimate the need for updateBoard, but they're kind of going to do the same thing
-winnerRow :: Board -> (Color, Bool)
+{-winnerRow :: Board -> (Color, Bool)
 winnerRow = undefined
 
 winnerColumn :: Board -> (Color, Bool)
@@ -76,10 +77,71 @@ winnerDiagonalAsc :: Board -> (Color, Bool)
 winnerDiagonalAsc = undefined 
 
 winnerDiagonalDes :: Board -> (Color, Bool)
-winnerDiagonalDes = undefined 
+winnerDiagonalDes = undefined -}
 
-isWinner :: Board -> Maybe Color --returns the Color and True if there is a a winner, so that we know which player won. 
-isWinner bd = undefined --snd (winnerColumn bd) | snd (winnerRow bd) | snd (winnerDiagonalAsc bd) | snd (winnerDiagonalDes bd)
+getColumn :: Board -> Move -> Row
+getColumn (Board cols clr) mv = 
+        let
+            drC = drop (m - 1) cols
+        in 
+            if drC == [] then [] else head drC
+
+getCoordinate :: Board -> Move -> (Int, Int)
+getCoordinate (Board col clr) mv = (last getColumn ((Board cols clr) mv) , mv) --(Int, Int)
+
+--If no color is in that position, or if that position is out of bounds, it will return []
+findColor :: Board -> (Int, Int) -> Color
+findColor (Board bd clr) (x,y) = 
+    let 
+        drC = drop (y - 1) bd
+        col = if drC == [] then [] else head drC
+        beforein = if col == [] then Neither else drop (x - 1) col
+    in 
+        if beforein == Neither 
+        then Neither 
+        else (if drop(x-1) col == [] then Neither else head (drop (x - 1) col))
+
+
+leftAsc :: Board -> Color -> (Int, Int) -> Int -> Int --Board -> Color -> Move -> Count ->4 FinalCount
+leftAsc (Board cols clr) mv 4 = 4
+leftAsc (Board cols clr) mv cnt = undefined
+
+rightAsc :: Board -> Color -> (Int, Int) -> Int -> Int
+rightAsc (Board cols clr) mv 4 = 4
+rightAsc (Board cols clr) mv cnt = undefined
+
+leftDsc :: Board -> Color -> (Int, Int) -> Int -> Int --Board -> Color -> Move -> Count ->4 FinalCount
+leftDsc (Board cols clr) mv 4 = 4
+leftDsc (Board cols clr) mv cnt = undefined
+
+rightDsc :: Board -> Color -> (Int, Int) -> Int -> Int
+rightDsc (Board cols clr) c (row, col) 4 = 4
+rightDsc (Board cols clr) c (row, col) cnt = 
+    let
+        nextPosition = (row - 1, col + 1)
+        newCol = findColor (Board cols clr) nextPosition
+    in
+        if newCol == c
+        then 1 + rightDsc (Board cols clr) c nextPosition cnt 
+
+down :: Board -> Color -> (Int, Int) -> Int -> Int
+down (Board cols clr) mv 4 = 4 
+down (Board cols clr) mv cnt = 
+
+right :: Board -> Color -> (Int, Int) -> Int -> Int
+right (Board cols clr) mv 4 = 4 
+right (Board cols clr) mv cnt = 
+
+left :: Board -> Color -> (Int, Int) -> Int -> Int
+left (Board cols clr) mv 4 = 4 
+left (Board cols clr) mv cnt = 
+
+
+
+
+isWinner :: Board -> Move -> Maybe Color --returns the Color and True if there is a a winner, so that we know which player won. 
+isWinner (Board cols clr) mv =  
+    let newcolor = --snd (winnerColumn bd) | snd (winnerRow bd) | snd (winnerDiagonalAsc bd) | snd (winnerDiagonalDes bd)
 --Data type for outcome to check if tie
 --
 --Written by MTP above
@@ -88,5 +150,5 @@ isWinner bd = undefined --snd (winnerColumn bd) | snd (winnerRow bd) | snd (winn
 --Full Credit: All of these functions should consider possible errors or edge cases: what if there no winner, what if the move is not legal for the current game, etc. Use Maybe's or Either's appropriately.--
 
 --TESTER CODE--
-testWC = winnerColumn (Board [[Red, Black, Red, Black, Black, Red], [Red, Black, Black, Black, Black, Red], [Black, Red, Black, Red, Red, Black]] Red) --WORKS
+--testWC = winnerColumn (Board [[Red, Black, Red, Black, Black, Red], [Red, Black, Black, Black, Black, Red], [Black, Red, Black, Red, Red, Black]] Red) --WORKS
 testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) --WORKS
