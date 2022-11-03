@@ -32,6 +32,7 @@ showColor (Black) = "X"
 rows = 6
 columns = 7
 
+
 -- Used to keep track of what level we are making our move on; SC
 --colCounter = [ [(x,1)] | x <- [1..columns] ] 
 
@@ -52,11 +53,35 @@ availableMoves brd =
             else aux (Board cs clr) lst (cnt+1)
             --also switched out 6 for rows to make it more abstract (?)
 
-updateBoard :: Board -> Move -> Maybe Board
-updateBoard (Board (x:xs) clr) col = undefined --if () then Nothing else Just ...
+--was pattern matched but we tweakin
+--make sure when you call updateBoard passing in a 0 for count initially 
+updateBoard :: Board -> Move -> Int -> [Column] -> Board
+updateBoard (Board (x:xs) clr) mv cnt accumlst = 
+    if (cnt == mv) then Board ((accumlst ++ (x:clr) ++ xs) switchColor(clr)) 
+    else updateBoard (Board xs switchColor(clr)) mv (cnt+1) (x:accumlst)
 
-makeMove :: Board -> Move -> Board
-makeMove = undefined --if move `elem` availableMoves brd then else return error
+{-updateBoard b@(Board (x:xs) clr) mv = 
+    if mv `elem` (availableMoves b)
+    then
+         aux (Board (x:xs) clr) mv mv = 
+         aux (Board (x:xs) clr) cnt mv = 
+        if mv > cnt then aux (Board (x:xs) clr) (cnt + 1) mv 
+        else -}
+        
+    
+switchColor :: Color -> Color
+switchColor clr
+    | clr == Black = Red
+    | clr == Red = Black
+--if clr == Black then clr = Red else clr = Black
+--if () then Nothing else Just ...
+
+{-makeMove :: Board -> Move -> Board
+makeMove brd mv = 
+    if mv `elem` availableMoves(brd) 
+        then updateBoard brd mv
+    else -}
+--if move `elem` availableMoves brd then else return error
 --If we check if it's a valid move before, do we need a Maybe Board? TBH I still don't really understand
 --Maybe. I think it would elimate the need for updateBoard, but they're kind of going to do the same thing
 winnerRow :: Board -> (Color, Bool)
