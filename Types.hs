@@ -23,7 +23,7 @@ type Move = Int
 type State = (Board, Color)
 --state of the board, where the color represents the winner if there is one 
 -- A little superfluous but we'll see.
-type Winner = (Bool, Color)
+data Winner = YesWinner Color | NoWinner | Tie deriving (Eq, Show)
 type Coordinate = (Int, Int)
 type Direction = (Int, Int)
 
@@ -146,6 +146,8 @@ checkWinner (Board cols cl) cChecking (row, col) =
     let
         --I don't like having all this repeated but I didn't want to deal with an
         --association list when trying to add the directions together
+        mvsAvl = availableMoves (Board cols cl)--if this equals zero and there is no winner, they tie for losers
+        
         lftAsc = countDir (Board cols cl) cChecking (row, col) (1,-1) 0
         rtAsc = countDir (Board cols cl) cChecking (row, col) (1,1) 0
         lft = countDir (Board cols cl) cChecking (row, col) (0,-1) 0
@@ -160,8 +162,11 @@ checkWinner (Board cols cl) cChecking (row, col) =
         vert = dw + 1
     in  
         if fstDiag > 3 || sndDiag > 3 || horz > 3 || vert > 3
-        then (True, cChecking)
-        else (False, Neither)
+        then YesWinner cChecking --winner
+        else 
+            if null mvsAvl
+            then Tie
+            else NoWinner
 
 --We will additonally need "A pretty show function for a game state, to ease debugging."
 --Full Credit: All of these functions should consider possible errors or edge cases: what if there no winner, what if the move is not legal for the current game, etc. Use Maybe's or Either's appropriately.--
