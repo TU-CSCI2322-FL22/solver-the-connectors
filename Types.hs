@@ -27,6 +27,14 @@ data Winner = YesWinner Color | NoWinner | Tie deriving (Eq, Show)
 type Coordinate = (Int, Int)
 type Direction = (Int, Int)
 
+showBoard :: Board -> Int -> [Char]
+showBoard (Board cs clr) 0 = []
+showBoard (Board cs clr) cnt = 
+    let bd = (Board cs clr)
+    in ((foldr (\x y -> if (findColor (Board cs clr) (cnt, x) == Red) then '0' :y else if (findColor (Board cs clr) (cnt, x) == Black) then 'X':y else '-':y)) [] [1..7]) ++ show('\n') ++ showBoard bd (cnt-1)
+
+sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 6
+
 
 
 showcolor (Red) = "0"
@@ -129,12 +137,12 @@ findColor (Board cols clr) (x,y) =
         col = getColumn (Board cols clr) y
     in
         if col == []
-        then error "Not a valid coordinate! No column! (Either move hasn't been made here or out of bounds)"
+        then Neither--error "Not a valid coordinate! No column! (Either move hasn't been made here or out of bounds)"
         else getColorAtRow col x
     where
         getColorAtRow :: Column -> Int -> Color
         getColorAtRow cl r
-            |drop (r-1) cl == [] = error "Not a valid coordinate! No row! (Either move hasn't been made here or out of bounds)"
+            |drop (r-1) cl == [] = Neither--error "Not a valid coordinate! No row! (Either move hasn't been made here or out of bounds)"
             |otherwise = head (drop (r-1) cl)
 
     
