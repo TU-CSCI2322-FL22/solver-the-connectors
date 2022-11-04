@@ -71,6 +71,15 @@ updateBoard (Board (x:xs) clr) mv  =
                then (Board (accumlst ++ (clr:x):xs) newcolor)
                else aux (Board xs clr) mv (cnt+1) (x:accumlst)
 
+
+makeMove :: Board -> Move -> (Board, Winner)
+makeMove (Board (x:xs) clr) mv =
+    let
+        newBoard = updateBoard (Board (x:xs) clr) mv
+        win = checkWinner newBoard clr mvCoordinate
+        mvCoordinate = (length (getColumn (Board (x:xs) clr) mv) ,mv)
+    in (newBoard, win)
+
 ub = updateBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 1 
 {-updateBoard b@(Board (x:xs) clr) mv =
     if mv `elem` (availableMoves b)
@@ -101,6 +110,7 @@ makeMove brd mv =
 --Takes a board and a move (column number) and returns the column
 --returns [] if the column is empty or out of bounds
 --otherwise it returns a column
+
 getColumn :: Board -> Move -> Column
 getColumn (Board cols clr) mv = 
         let
