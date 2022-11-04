@@ -60,19 +60,18 @@ availableMoves brd =
 --was pattern matched but we tweakin
 --make sure when you call updateBoard passing in a 0 for count initially
 --I feel like to updateBoard/makeMove we onlY need Board and Move as inputss 
-updateBoard :: Board -> Move -> Int -> [Column] -> Board
-updateBoard (Board (x:xs) clr) mv cnt accumlst = 
-    let 
-        newcolor = 
-            if clr == Red 
-            then Black 
-            else Red
-    in 
-        if (cnt == mv) 
-        then (Board (accumlst ++ (clr:x):xs) newcolor)
-        else updateBoard (Board xs clr) mv (cnt+1) (x:accumlst)
+updateBoard :: Board -> Move  -> Board
+updateBoard (Board (x:xs) clr) mv  = 
+    aux (Board (x:xs) clr) mv 0 []
+    where 
+        aux :: Board -> Move -> Int -> [Column] -> Board
+        aux (Board (x:xs) clr) mv cnt accumlst = 
+            let newcolor = if clr == Red then Black else Red
+            in if (cnt == mv) 
+               then (Board (accumlst ++ (clr:x):xs) newcolor)
+               else aux (Board xs clr) mv (cnt+1) (x:accumlst)
 
-ub = updateBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 1 0 []
+ub = updateBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 1 
 {-updateBoard b@(Board (x:xs) clr) mv =
     if mv `elem` (availableMoves b)
     then
