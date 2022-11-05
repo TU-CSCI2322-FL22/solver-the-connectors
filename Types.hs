@@ -151,6 +151,7 @@ findColor (Board cols clr) (x,y) =
 --takes board, Color we're checking for, coord of piece we're "at", direction we're going in, and a count
 --returns a count of how many in a row of the color were checking there is in that Direction
 countDir :: Board -> Color -> Coordinate -> Direction -> Int -> Int
+countDir (Board cols cl) cChecking (row, col) (mvR, mvC) 4 = 4 --added by MTP to stop infinite loop
 countDir (Board cols cl) cChecking (row, col) (mvR, mvC) cnt =
     let
         nextPos = (row + mvR, col + mvC)
@@ -174,8 +175,8 @@ checkWinner (Board cols cl) cChecking (row, col) =
         dw = countDir (Board cols cl) cChecking (row, col) (-1, 0) 0
         rtDsc = countDir (Board cols cl) cChecking (row, col) (-1,1) 0
 
-        fstDiag = lftAsc + 1 + rtDsc
-        sndDiag = rtAsc + 1 + lftDsc
+        fstDiag = lftAsc + 1 + rtDsc -- should this be rtAsc?
+        sndDiag = rtAsc + 1 + lftDsc --should this be lftDsc?
         horz = lft + 1 + rt
         vert = dw + 1
     in  
@@ -190,5 +191,5 @@ checkWinner (Board cols cl) cChecking (row, col) =
 --Full Credit: All of these functions should consider possible errors or edge cases: what if there no winner, what if the move is not legal for the current game, etc. Use Maybe's or Either's appropriately.--
 
 --TESTER CODE--
---testWC = winnerColumn (Board [[Red, Black, Red, Black, Black, Red], [Red, Black, Black, Black, Black, Red], [Black, Red, Black, Red, Red, Black]] Red) --WORKS
+testWC = checkWinner (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red]] Black) Red (2,1) --WORKS
 testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) --WORKS
