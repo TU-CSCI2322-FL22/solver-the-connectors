@@ -31,7 +31,8 @@ showBoard :: Board -> Int -> [Char]
 showBoard (Board cs clr) 0 = []
 showBoard (Board cs clr) cnt = 
     let bd = (Board cs clr)
-    in ((foldr (\x y -> if (findColor (Board cs clr) (cnt, x) == Red) then '0' :y else if (findColor (Board cs clr) (cnt, x) == Black) then 'X':y else '-':y)) [] [1..7]) ++ show('\n') ++ showBoard bd (cnt-1)
+    in ((foldr (\x y -> if (findColor (Board cs clr) (cnt, x) == Red) then '0' :y else if (findColor (Board cs clr) (cnt, x) == Black) then 'X':y else '-':y)) [] [1..7]) 
+       ++ "\n" ++ showBoard bd (cnt-1)
 
 sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 6
 
@@ -39,6 +40,7 @@ sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black,
 
 showcolor (Red) = "0"
 showColor (Black) = "X"
+showColor (Neither) = "-"
 
 rows = 6
 columns = 7
@@ -161,10 +163,8 @@ countDir (Board cols cl) cChecking (row, col) (mvR, mvC) cnt =
 
 checkWinner :: Board -> Color -> Coordinate -> Winner
 checkWinner (Board cols cl) cChecking (row, col) =
-    let
-        --I don't like having all this repeated but I didn't want to deal with an
-        --association list when trying to add the directions together
-        mvsAvl = availableMoves (Board cols cl)--if this equals zero and there is no winner, they tie for losers
+    let 
+        mvsAvl = availableMoves (Board cols cl)
         
         lftAsc = countDir (Board cols cl) cChecking (row, col) (1,-1) 0
         rtAsc = countDir (Board cols cl) cChecking (row, col) (1,1) 0
@@ -180,7 +180,7 @@ checkWinner (Board cols cl) cChecking (row, col) =
         vert = dw + 1
     in  
         if fstDiag > 3 || sndDiag > 3 || horz > 3 || vert > 3
-        then YesWinner cChecking --winner
+        then YesWinner cChecking 
         else 
             if null mvsAvl
             then Tie
