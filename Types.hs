@@ -31,16 +31,16 @@ showBoard :: Board -> Int -> [Char]
 showBoard (Board cs clr) 0 = []
 showBoard (Board cs clr) cnt = 
     let bd = (Board cs clr)
-    in ((foldr (\x y -> if (findColor (Board cs clr) (cnt, x) == Red) then '0' :y else if (findColor (Board cs clr) (cnt, x) == Black) then 'X':y else '-':y)) [] [1..7]) 
+    in (foldr (\x y -> if (findColor (Board cs clr) (cnt, x) == Red) then '0' :y else if (findColor (Board cs clr) (cnt, x) == Black) then 'X':y else '-':y)) [] [1..7] 
        ++ "\n" ++ showBoard bd (cnt-1)
 
 sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 6
 
 
 
-showcolor (Red) = "0"
-showColor (Black) = "X"
-showColor (Neither) = "-"
+showcolor (Red) = '0'
+showColor (Black) = 'X'
+showColor (Neither) = '-'
 
 rows = 6
 columns = 7
