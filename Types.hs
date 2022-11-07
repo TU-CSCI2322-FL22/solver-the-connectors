@@ -140,6 +140,8 @@ findColor (Board cols clr) (x,y) =
     in
         if col == []
         then Neither--error "Not a valid coordinate! No column! (Either move hasn't been made here or out of bounds)"
+        else if (x < 1 || y < 1) 
+        then Neither
         else getColorAtRow col x
     where
         getColorAtRow :: Column -> Int -> Color
@@ -154,13 +156,16 @@ countDir :: Board -> Color -> Coordinate -> Direction -> Int -> Int
 countDir (Board cols cl) cChecking (row, col) (mvR, mvC) 4 = 4 --added by MTP to stop infinite loop
 countDir (Board cols cl) cChecking (row, col) (mvR, mvC) cnt =
     let
-        nextPos = (row + mvR, col + mvC)
+        nextPos = (row + (mvR), col + (mvC))
         nextPosCol = findColor (Board cols cl) nextPos
     in
         if nextPosCol == cChecking
         then countDir (Board cols cl) cChecking nextPos (mvR, mvC) (cnt + 1)
         else cnt
 
+--cD = (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Black ()
+fC = countDir (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Red (2,1) (-1,0) 0
+findC = findColor (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) (-1,1)
 
 checkWinner :: Board -> Color -> Coordinate -> Winner
 checkWinner (Board cols cl) cChecking (row, col) =
@@ -175,8 +180,8 @@ checkWinner (Board cols cl) cChecking (row, col) =
         dw = countDir (Board cols cl) cChecking (row, col) (-1, 0) 0
         rtDsc = countDir (Board cols cl) cChecking (row, col) (-1,1) 0
 
-        fstDiag = lftAsc + 1 + rtDsc -- should this be rtAsc?
-        sndDiag = rtAsc + 1 + lftDsc --should this be lftDsc?
+        fstDiag = lftAsc + 1 + rtDsc 
+        sndDiag = rtAsc + 1 + lftDsc 
         horz = lft + 1 + rt
         vert = dw + 1
     in  
@@ -191,5 +196,8 @@ checkWinner (Board cols cl) cChecking (row, col) =
 --Full Credit: All of these functions should consider possible errors or edge cases: what if there no winner, what if the move is not legal for the current game, etc. Use Maybe's or Either's appropriately.--
 
 --TESTER CODE--
-testWC = checkWinner (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red]] Black) Red (2,1) --WORKS
-testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) --WORKS
+sBB = showBoard (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) 6
+testWC = checkWinner (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Red (2,1) --WORKS
+testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black], [],[],[],[]] Red) --WORKS
+
+testFC = findColor (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red]] Black) (3,3)
