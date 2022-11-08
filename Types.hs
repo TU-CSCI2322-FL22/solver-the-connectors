@@ -153,13 +153,12 @@ checkWinner (Board cols cl) cChecking (row, col) =
         rt = countDir (Board cols cl) cChecking (row, col) (0,1) 0
         lftDsc = countDir (Board cols cl) cChecking (row, col) (-1,-1) 0
         dw = countDir (Board cols cl) cChecking (row, col) (-1, 0) 0
-        up = countDir (Board cols cl) cChecking (row, col) (1, 0) 0
         rtDsc = countDir (Board cols cl) cChecking (row, col) (-1,1) 0
 
         fstDiag = lftAsc + 1 + rtDsc 
         sndDiag = rtAsc + 1 + lftDsc 
         horz = lft + 1 + rt
-        vert = dw + 1 + up
+        vert = dw + 1
     in  
         if fstDiag > 3 || sndDiag > 3 || horz > 3 || vert > 3
         then YesWinner cChecking 
