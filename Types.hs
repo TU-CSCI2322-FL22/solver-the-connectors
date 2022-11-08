@@ -91,31 +91,6 @@ makeMove (Board (x:xs) clr) mv =
     in (newBoard, win)
 
 ub = updateBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 1 
-{-updateBoard b@(Board (x:xs) clr) mv =
-    if mv `elem` (availableMoves b)
-    then
-         aux (Board (x:xs) clr) mv mv = 
-         aux (Board (x:xs) clr) cnt mv = 
-        if mv > cnt then aux (Board (x:xs) clr) (cnt + 1) mv 
-        else -}
-        
-    
-{-switchColor :: Color -> Color
-switchColor clr
-    | clr == Black = Red
-    | clr == Red = Black-}
---if clr == Black then clr = Red else clr = Black
---if () then Nothing else Just ...
-
-{-makeMove :: Board -> Move -> Board
-makeMove brd mv = 
-    if mv `elem` availableMoves(brd) 
-        then updateBoard brd mv
-    else -}
---if move `elem` availableMoves brd then else return error
---If we check if it's a valid move before, do we need a Maybe Board? TBH I still don't really understand
---Maybe. I think it would elimate the need for updateBoard, but they're kind of going to do the same thing
-
 
 --Takes a board and a move (column number) and returns the column
 --returns [] if the column is empty or out of bounds
@@ -139,21 +114,21 @@ findColor (Board cols clr) (x,y) =
         col = getColumn (Board cols clr) y
     in
         if col == []
-        then Neither--error "Not a valid coordinate! No column! (Either move hasn't been made here or out of bounds)"
+        then Neither
         else if (x < 1 || y < 1) 
         then Neither
         else getColorAtRow col x
     where
         getColorAtRow :: Column -> Int -> Color
         getColorAtRow cl r
-            |drop (r-1) cl == [] = Neither--error "Not a valid coordinate! No row! (Either move hasn't been made here or out of bounds)"
+            |drop (r-1) cl == [] = Neither
             |otherwise = head (drop (r-1) cl)
 
     
 --takes board, Color we're checking for, coord of piece we're "at", direction we're going in, and a count
 --returns a count of how many in a row of the color were checking there is in that Direction
 countDir :: Board -> Color -> Coordinate -> Direction -> Int -> Int
-countDir (Board cols cl) cChecking (row, col) (mvR, mvC) 4 = 4 --added by MTP to stop infinite loop
+countDir (Board cols cl) cChecking (row, col) (mvR, mvC) 4 = 4 
 countDir (Board cols cl) cChecking (row, col) (mvR, mvC) cnt =
     let
         nextPos = (row + (mvR), col + (mvC))
@@ -197,7 +172,13 @@ checkWinner (Board cols cl) cChecking (row, col) =
 
 --TESTER CODE--
 sBB = showBoard (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) 6
-testWC = checkWinner (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Red (2,1) --WORKS
-testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black], [],[],[],[]] Red) --WORKS
+testWC = checkWinner (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Red (2,1) 
+testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black], [],[],[],[]] Red) 
 
 testFC = findColor (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red]] Black) (3,3)
+
+test2 = checkWinner (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Red, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Red, Black, Red], [Black],[Red, Black],[Black]] Black) Red (4,1)
+b2 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Red, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Red, Black, Red], [Black],[Red, Black],[Black]] Red) 6)
+
+
+
