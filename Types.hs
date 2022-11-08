@@ -153,12 +153,13 @@ checkWinner (Board cols cl) cChecking (row, col) =
         rt = countDir (Board cols cl) cChecking (row, col) (0,1) 0
         lftDsc = countDir (Board cols cl) cChecking (row, col) (-1,-1) 0
         dw = countDir (Board cols cl) cChecking (row, col) (-1, 0) 0
+        up = countDir (Board cols cl) cChecking (row, col) (1, 0) 0
         rtDsc = countDir (Board cols cl) cChecking (row, col) (-1,1) 0
 
         fstDiag = lftAsc + 1 + rtDsc 
         sndDiag = rtAsc + 1 + lftDsc 
         horz = lft + 1 + rt
-        vert = dw + 1
+        vert = dw + 1 + up
     in  
         if fstDiag > 3 || sndDiag > 3 || horz > 3 || vert > 3
         then YesWinner cChecking 
@@ -178,7 +179,13 @@ testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Blac
 testFC = findColor (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red]] Black) (3,3)
 
 test2 = checkWinner (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Red, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Red, Black, Red], [Black],[Red, Black],[Black]] Black) Red (4,1)
-b2 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Red, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Red, Black, Red], [Black],[Red, Black],[Black]] Red) 6)
+b2 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Red, Black, Red], [Black],[Red, Black],[Black]] Red) 6)
+
+test3 = checkWinner (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Black, Black, Black, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) Black (2,2)
+b3 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Black, Black, Black, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) 6)
+
+test4 = checkWinner (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) Red (1,1)
+b4 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) 6)
 
 
 
