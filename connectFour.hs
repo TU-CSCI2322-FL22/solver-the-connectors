@@ -27,35 +27,31 @@ data Winner = YesWinner Color | NoWinner | Tie deriving (Eq, Show)
 type Coordinate = (Int, Int)
 type Direction = (Int, Int)
 
-showBoard :: Board -> Int -> [Char]
-showBoard (Board cs clr) 0 = []
-showBoard (Board cs clr) cnt = 
-    let bd = (Board cs clr)
-    in (foldr (\x y -> if (findColor (Board cs clr) (cnt, x) == Red) then '0' :y else if (findColor (Board cs clr) (cnt, x) == Black) then 'X':y else '-':y)) [] [1..7] 
-       ++ "\n" ++ showBoard bd (cnt-1)
-
-sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 6
-
-
-
-showcolor (Red) = '0'
-showColor (Black) = 'X'
-showColor (Neither) = '-'
-
-rows = 6
-columns = 7
-
-
--- Used to keep track of what level we are making our move on; SC
---colCounter = [ [(x,1)] | x <- [1..columns] ] 
-
 initialBoard = Board [[] | x <- [1..columns]] Red 
 -- Board [[],[],[],[],[],[],[]] Red
+rows = 6
+columns = 7 
 
 
-availableMoves :: Board -> [Move] 
---Changed it wso availableMoves only needs the Board as an argument to return available moves
--- Board -> [initially empty move lst] -> (index count) -> [resulting move lst]
+showBoard :: Board -> [Char]
+showBoard brd =
+    aux brd rows
+    where
+        aux :: Board -> Int -> [Char]
+        aux brd 0 = []
+        aux brd cnt =
+            let 
+                mkCol = foldr (\x y -> if findColor brd (cnt, x) == Red
+                                    then '0' :y 
+                                    else if findColor brd (cnt, x) == Black 
+                                         then 'X':y 
+                                         else '-':y) [] [1..7] 
+            in  
+                mkCol ++ "\n" ++ aux brd (cnt-1)
+
+
+
+availableMoves :: Board -> [Move]
 availableMoves brd = 
     aux brd [] 0
     where
@@ -65,11 +61,10 @@ availableMoves brd =
             if length c < rows 
             then aux (Board cs clr) (cnt:lst) (cnt+1) 
             else aux (Board cs clr) lst (cnt+1)
-            --also switched out 6 for rows to make it more abstract (?)
 
---was pattern matched but we tweakin
---make sure when you call updateBoard passing in a 0 for count initially
---I feel like to updateBoard/makeMove we onlY need Board and Move as inputss 
+--updateBoard takes a Board and Move as arguments, and returns a new Board where that Move has been made
+--and is represented in the Board. (Also returns the color of the person whose turn is next.)
+--Note: we've already made sure that it's a valid move in makeMove
 updateBoard :: Board -> Move  -> Board
 updateBoard (Board (x:xs) clr) mv  = 
     aux (Board (x:xs) clr) mv 1 []
@@ -84,12 +79,16 @@ updateBoard (Board (x:xs) clr) mv  =
 
 
 makeMove :: Board -> Move -> (Board, Winner)
-makeMove (Board (x:xs) clr) mv =
+makeMove (Board cols clr) mv =
     let
-        newBoard = updateBoard (Board (x:xs) clr) mv
-        win = checkWinner newBoard clr mvCoordinate
-        mvCoordinate = (length (getColumn (Board (x:xs) clr) mv) ,mv)
-    in (newBoard, win)
+        avlMvs = availableMoves (Board cols clr) --makes lst of available moves
+        newBoard = updateBoard (Board cols clr) mv -- creates new board that includes the new move piece
+        win = checkWinner newBoard clr coordOfMv --checksWinner
+        coordOfMv = (length (getColumn (Board cols clr) mv) ,mv) --coordinate of the move
+    in 
+        if mv `elem` avlMvs
+        then (newBoard, win)
+        else error "This is not a valid move! (makeMove)"
 
 ub = updateBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red) 1 
 
@@ -132,7 +131,7 @@ countDir :: Board -> Color -> Coordinate -> Direction -> Int -> Int
 countDir (Board cols cl) cChecking (row, col) (mvR, mvC) 4 = 4 
 countDir (Board cols cl) cChecking (row, col) (mvR, mvC) cnt =
     let
-        nextPos = (row + (mvR), col + (mvC))
+        nextPos = (row + mvR, col + mvC)
         nextPosCol = findColor (Board cols cl) nextPos
     in
         if nextPosCol == cChecking
@@ -168,11 +167,13 @@ checkWinner (Board cols cl) cChecking (row, col) =
             then Tie
             else NoWinner
 
---We will additonally need "A pretty show function for a game state, to ease debugging."
---Full Credit: All of these functions should consider possible errors or edge cases: what if there no winner, what if the move is not legal for the current game, etc. Use Maybe's or Either's appropriately.--
-
+--Not sure if we need these:
+showcolor (Red) = '0'
+showColor (Black) = 'X'
+showColor (Neither) = '-'
 --TESTER CODE--
-sBB = showBoard (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) 6
+sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red)
+sBB = showBoard (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black)
 testWC = checkWinner (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Red (2,1) 
 testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black], [],[],[],[]] Red) 
 
