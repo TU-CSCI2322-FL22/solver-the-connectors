@@ -1,9 +1,8 @@
-module Board where
+module ConnectFour where
 import Data.List
-import Data.Tuple.Extra (secondM)
 
 ------------------------------------------MILESTONE ONE-----------------------------------------------
-{-For this milestone, you will need to be able to represent the board game in Haskell, make moves on 
+{-For this milestone, you will need to be able to represent the maybe game in Haskell, make moves on 
 the board game, and tell if a player has won the board game. -}
 
 --Written by MTP below
@@ -212,12 +211,3 @@ b4 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [B
 b4u1 = putStrLn (showBoard (updateBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) 5))
 b4u2 =  putStrLn (showBoard(updateBoard(Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) 6 ))
 b4u3 = putStrLn (showBoard (updateBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Red) 7))
-
-
-
-
-------------------------------------------MILESTONE TWO-----------------------------------------------
-{-For this milestone, you will need to be able to represent the board game in Haskell, make moves on 
-the board game, and tell if a player has won the board game. -}
-
-module Solver where
