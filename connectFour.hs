@@ -58,7 +58,7 @@ availableMoves brd =
         aux :: Board -> [Move] -> Int -> [Move]
         aux (Board [] clr) lst cnt = lst
         aux (Board (c:cs) clr) lst cnt =  
-            if length c < rows
+            if length c < rows 
             then aux (Board cs clr) (cnt:lst) (cnt+1) 
             else aux (Board cs clr) lst (cnt+1)
 
