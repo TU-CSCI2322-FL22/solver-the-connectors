@@ -1,5 +1,6 @@
 module Board where
 import Data.List
+import Data.Tuple.Extra (secondM)
 
 ------------------------------------------MILESTONE ONE-----------------------------------------------
 {-For this milestone, you will need to be able to represent the board game in Haskell, make moves on 
@@ -50,15 +51,15 @@ showBoard brd =
                 mkCol ++ "\n" ++ aux brd (cnt-1)
 
 
-
+--Makes a list of all columns where a move can be made 
 availableMoves :: Board -> [Move]
 availableMoves brd = 
-    aux brd [] 0
+    aux brd [] 1
     where
         aux :: Board -> [Move] -> Int -> [Move]
         aux (Board [] clr) lst cnt = lst
         aux (Board (c:cs) clr) lst cnt =  
-            if length c < rows 
+            if length c < rows
             then aux (Board cs clr) (cnt:lst) (cnt+1) 
             else aux (Board cs clr) lst (cnt+1)
 
@@ -77,14 +78,15 @@ updateBoard (Board (x:xs) clr) mv  =
                then (Board (accumlst ++ (x ++ [clr]):xs) newcolor)
                else aux (Board xs clr) mv (cnt+1) (accumlst ++ [x])
 
-
+--makeMove takes a Board and a Move and returns a tuple of the updated Board and the winner status
+--If the move is not valid, there is an error
 makeMove :: Board -> Move -> (Board, Winner)
 makeMove (Board cols clr) mv =
     let
         avlMvs = availableMoves (Board cols clr) --makes lst of available moves
         newBoard = updateBoard (Board cols clr) mv -- creates new board that includes the new move piece
         win = checkWinner newBoard clr coordOfMv --checksWinner
-        coordOfMv = (length (getColumn (Board cols clr) mv) ,mv) --coordinate of the move
+        coordOfMv = (length (getColumn newBoard mv), mv) --coordinate of the move
     in 
         if mv `elem` avlMvs
         then (newBoard, win)
@@ -171,6 +173,26 @@ checkWinner (Board cols cl) cChecking (row, col) =
 showcolor (Red) = '0'
 showColor (Black) = 'X'
 showColor (Neither) = '-'
+
+
+--Tester Code--
+
+first = putStrLn (showBoard initialBoard)
+sndM = makeMove initialBoard 4
+sndBrd = putStrLn (showBoard (fst sndM))
+thrdM = makeMove (fst sndM) 3
+thrdBrd = putStrLn(showBoard (fst thrdM))
+fM = makeMove (fst thrdM) 4
+ffM = makeMove (fst fM) 3
+sM = makeMove (fst ffM) 4
+svM = makeMove(fst sM) 2
+eM = makeMove (fst svM) 4
+isThereWin = snd eM
+nM = makeMove (fst eM) 4
+
+
+
+
 --TESTER CODE--
 sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black]] Red)
 sBB = showBoard (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black)
