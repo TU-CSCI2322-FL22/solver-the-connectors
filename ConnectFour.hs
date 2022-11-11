@@ -12,7 +12,7 @@ data Board = Board [Column] Color deriving (Eq, Show)
 --turn is next
 --[Columns] and Color of player currently making move
 --create an instance of Show for Board to show the current game state
-data Color = Red | Black | Neither deriving (Eq, Show)
+data Color = Red | Black deriving (Eq, Show)
 --None represents neither color; Using it for state
 type Column = [Color]
 --list of colors in that column
@@ -23,7 +23,8 @@ type Move = Int
 type State = (Board, Color)
 --state of the board, where the color represents the winner if there is one 
 -- A little superfluous but we'll see.
-data Winner = YesWinner Color | NoWinner | Tie deriving (Eq, Show)
+data Winner = YesWinner Color | Tie deriving (Eq, Show)
+--noWinner == Nothing
 type Coordinate = (Int, Int)
 type Direction = (Int, Int)
 
@@ -41,9 +42,9 @@ showBoard brd =
         aux brd 0 = []
         aux brd cnt =
             let 
-                mkCol = foldr (\x y -> if findColor brd (cnt, x) == Red
+                mkCol = foldr (\x y -> if findColor brd (cnt, x) == Just Red
                                     then '0' :y 
-                                    else if findColor brd (cnt, x) == Black 
+                                    else if findColor brd (cnt, x) == Just Black 
                                          then 'X':y 
                                          else '-':y) [] [1..7] 
             in  
@@ -79,7 +80,7 @@ updateBoard (Board (x:xs) clr) mv  =
 
 --makeMove takes a Board and a Move and returns a tuple of the updated Board and the winner status
 --If the move is not valid, there is an error
-makeMove :: Board -> Move -> (Board, Winner)
+makeMove :: Board -> Move -> (Board, Maybe Winner)
 makeMove (Board cols clr) mv =
     let
         avlMvs = availableMoves (Board cols clr) --makes lst of available moves
@@ -109,21 +110,23 @@ getColumn (Board cols clr) mv =
 --NOTE: Our makeMove function must prevent out of bound moves
 --(This doesn't check if it's out of bounds, it's just saying that if their is not a color in that
 --position it must be either empty or out of bounds)
-findColor :: Board -> Coordinate -> Color
+findColor :: Board -> Coordinate -> Maybe Color
 findColor (Board cols clr) (x,y) = 
     let
         col = getColumn (Board cols clr) y
     in
         if col == []
-        then Neither
+        then Nothing
         else if (x < 1 || y < 1) 
-        then Neither
-        else getColorAtRow col x
+        then Nothing
+        else case (getColorAtRow col x) of Just Red -> (getColorAtRow col x)
+                                           Just Black -> (getColorAtRow col x)
+        
     where
-        getColorAtRow :: Column -> Int -> Color
+        getColorAtRow :: Column -> Int -> Maybe Color
         getColorAtRow cl r
-            |drop (r-1) cl == [] = Neither
-            |otherwise = head (drop (r-1) cl)
+            |drop (r-1) cl == [] = Nothing
+            |otherwise = Just (head (drop (r-1) cl))
 
     
 --takes board, Color we're checking for, coord of piece we're "at", direction we're going in, and a count
@@ -135,7 +138,7 @@ countDir (Board cols cl) cChecking (row, col) (mvR, mvC) cnt =
         nextPos = (row + mvR, col + mvC)
         nextPosCol = findColor (Board cols cl) nextPos
     in
-        if nextPosCol == cChecking
+        if nextPosCol == Just cChecking
         then countDir (Board cols cl) cChecking nextPos (mvR, mvC) (cnt + 1)
         else cnt
 
@@ -143,7 +146,7 @@ countDir (Board cols cl) cChecking (row, col) (mvR, mvC) cnt =
 fC = countDir (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Red (2,1) (-1,0) 0
 findC = findColor (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) (-1,1)
 
-checkWinner :: Board -> Color -> Coordinate -> Winner
+checkWinner :: Board -> Color -> Coordinate -> Maybe Winner
 checkWinner (Board cols cl) cChecking (row, col) =
     let 
         mvsAvl = availableMoves (Board cols cl)
@@ -162,16 +165,15 @@ checkWinner (Board cols cl) cChecking (row, col) =
         vert = dw + 1
     in  
         if fstDiag > 3 || sndDiag > 3 || horz > 3 || vert > 3
-        then YesWinner cChecking 
+        then Just (YesWinner cChecking)
         else 
             if null mvsAvl
-            then Tie
-            else NoWinner
+            then Just Tie
+            else Nothing
 
 --Not sure if we need these:
 showcolor (Red) = '0'
 showColor (Black) = 'X'
-showColor (Neither) = '-'
 
 
 --Tester Code--
