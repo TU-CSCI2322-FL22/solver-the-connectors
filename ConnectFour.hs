@@ -28,6 +28,7 @@ data Winner = YesWinner Color | Tie deriving (Eq, Show)
 type Coordinate = (Int, Int)
 type Direction = (Int, Int)
 
+
 initialBoard = Board [[] | x <- [1..columns]] Red 
 -- Board [[],[],[],[],[],[],[]] Red
 rows = 6
@@ -172,7 +173,8 @@ checkWinner (Board cols cl) cChecking (row, col) =
             else Nothing
 
 --Not sure if we need these:
-showcolor (Red) = '0'
+showColor :: Color -> Char
+showColor (Red) = '0'
 showColor (Black) = 'X'
 
 
