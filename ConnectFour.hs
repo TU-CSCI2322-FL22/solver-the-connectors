@@ -1,5 +1,6 @@
 module ConnectFour where
 import Data.List
+import Data.Aeson (Value(Bool))
 
 ------------------------------------------MILESTONE ONE-----------------------------------------------
 {-For this milestone, you will need to be able to represent the maybe game in Haskell, make moves on 
@@ -171,9 +172,33 @@ checkWinner (Board cols cl) cChecking (row, col) =
             then Just Tie
             else Nothing
 
+--Going to assume that the color we pass in the Board tuple is the Color we're checking a winner for
+--Otherwise we just change it
+newCheckWinner :: Board -> Maybe Winner
+newCheckWinner (Board [] color) = Nothing
+newCheckWinner (Board cols color) = 
+    let colWinLs = [checkOneCol x color |x <- cols, length x > 4]
+    in  if True `elem` colWinLs
+        then Just (YesWinner color)
+        else Nothing
+    where
+        --use Int as a count in the recursion
+        checkOneCol :: Column -> Color -> Bool --make it into aux to remove extra int
+        checkOneCol col clr = aux col 0
+            where
+                aux :: Column -> Int -> Bool
+                aux [] ct = ct >= 4
+                aux [x] ct = x == clr && ct >= 3
+                aux (x:xs) ct = if x == clr then aux xs (ct+1) else aux xs 0
+        checkOneRow :: Board -> Bool
+        checkOneRow (Board (c:cs) clr) = undefined
+
+
+
 --Not sure if we need these:
 showcolor (Red) = '0'
 showColor (Black) = 'X'
+    
 
 
 --Tester Code--
