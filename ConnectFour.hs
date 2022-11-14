@@ -105,7 +105,11 @@ getColumn (Board cols clr) mv =
             drC = drop (mv - 1) cols
         in 
             if drC == [] then [] else head drC
-
+--takes in a column and an int, and returns the color at that indexs (row)
+getColorAtRow :: Column -> Int -> Maybe Color
+getColorAtRow cl r
+    |drop (r-1) cl == [] = Nothing
+    |otherwise = Just (head (drop (r-1) cl))
 --findColor takes a Board and a Coordinate and finds the Color at that coordinate
 --If there is no color in the coordinate, or if that position is out of bounds, it will return neither
 --NOTE: Our makeMove function must prevent out of bound moves
@@ -122,12 +126,7 @@ findColor (Board cols clr) (x,y) =
         then Nothing
         else case (getColorAtRow col x) of Just Red -> (getColorAtRow col x)
                                            Just Black -> (getColorAtRow col x)
-        
-    where
-        getColorAtRow :: Column -> Int -> Maybe Color
-        getColorAtRow cl r
-            |drop (r-1) cl == [] = Nothing
-            |otherwise = Just (head (drop (r-1) cl))
+
 
     
 --takes board, Color we're checking for, coord of piece we're "at", direction we're going in, and a count
@@ -178,7 +177,8 @@ newCheckWinner :: Board -> Maybe Winner
 newCheckWinner (Board [] color) = Nothing
 newCheckWinner (Board cols color) = 
     let colWinLs = [checkOneCol x color |x <- cols, length x > 4]
-    in  if True `elem` colWinLs
+        rowWinLs = [checkOneRow (Board cols color) x | x <- [1..6]]
+    in  if True `elem` colWinLs || True `elem` rowWinLs
         then Just (YesWinner color)
         else Nothing
     where
@@ -190,19 +190,31 @@ newCheckWinner (Board cols color) =
                 aux [] ct = ct >= 4
                 aux [x] ct = x == clr && ct >= 3
                 aux (x:xs) ct = if x == clr then aux xs (ct+1) else aux xs 0
-        checkOneRow :: Board -> Bool
-        checkOneRow (Board (c:cs) clr) = undefined
+        --Int in this situation is the row we're trying to find
+        checkOneRow :: Board -> Int -> Bool
+        checkOneRow (Board cols clr) r =
+            let row = [getColorAtRow x r | x <- cols] --List of maybes
+            in aux row 0
+            where 
+                aux :: [Maybe Color] -> Int -> Bool
+                aux [] ct = ct >= 4
+                aux [x] ct = x == Just clr && ct >= 3
+                aux (x:xs) ct = if x == Just clr then aux xs (ct+1) else aux xs 0
+        --Filter
+        
 
 
 
 --Not sure if we need these:
 showcolor (Red) = '0'
 showColor (Black) = 'X'
-    
+
 
 
 --Tester Code--
+--Test for row:
 
+wRR = Board [[Red,Red,Red],[Red,Black,Black],[Red,Black,Black],[Red,Black,Black],[Red,Black,Black]] Black
 first = putStrLn (showBoard initialBoard)
 sndM = makeMove initialBoard 4
 sndBrd = putStrLn (showBoard (fst sndM))
