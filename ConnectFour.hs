@@ -177,19 +177,20 @@ newCheckWinner (Board [] color) = Nothing
 newCheckWinner (Board cols color) = 
     let colWinLs = [checkOneCol x color |x <- cols, length x > 4]
         rowWinLs = [checkOneRow (Board cols color) x | x <- [1..6]]
-    in  if True `elem` colWinLs || True `elem` rowWinLs
+    in  if or colWinLs || or rowWinLs || checkDiag (Board cols color)
         then Just (YesWinner color)
         else Nothing
     where
-        --use Int as a count in the recursion
-        checkOneCol :: Column -> Color -> Bool --make it into aux to remove extra int
+        checkOneCol :: Column -> Color -> Bool
         checkOneCol col clr = aux col 0
             where
+                --Int is the number of the column we're checking
+                --Returns true if there is a win, false otherwise
                 aux :: Column -> Int -> Bool
                 aux [] ct = ct >= 4
                 aux [x] ct = x == clr && ct >= 3
                 aux (x:xs) ct = if x == clr then aux xs (ct+1) else aux xs 0
-        --Int in this situation is the row we're trying to find
+        --Int represents the row we are checking
         checkOneRow :: Board -> Int -> Bool
         checkOneRow (Board cols clr) r =
             let row = [getColorAtRow x r | x <- cols] --List of maybes
@@ -199,76 +200,55 @@ newCheckWinner (Board cols color) =
                 aux [] ct = ct >= 4
                 aux [x] ct = x == Just clr && ct >= 3
                 aux (x:xs) ct = if x == Just clr then aux xs (ct+1) else aux xs 0
-        --Filter
         checkDiag :: Board -> Bool
         checkDiag (Board cols clr) = 
             let colsRowTups = [zip [1..] x |x <- cols]
-            in findDiag colsRowTups clr 1
+            in aux colsRowTups clr 1--Recursion is nice because it stops as soon as we get one True
             where
-                --Int is the column number :) Like always
-                findDiag :: [[(Int, Color)]] -> Color -> Int -> Bool --make recursive so it ends when we find one diag
-                findDiag cols clr colNum = -- if we get through the first four columns without finding a diag we won't find one in the last three
-                    let col = head(drop (colNum - 1) cols)
-                    in  if null col
-                        then findDiag cols clr (colNum+1)
-                        else True `elem`[spotDiagDsc x cols clr colNum |x <- col]
-                        --ONLY CHECKING DSC RIGHT NOW
-                spotDiagDsc :: (Int,Color) -> [[(Int, Color)]] -> Color -> Int -> Bool--Int being the col number
-                spotDiagDsc (row, color) (c:cs) clr colNum = 
-                    if color /= clr || row < 4 || colNum > 4
+                aux :: [[(Int, Color)]] -> Color -> Int -> Bool --Int is the column number
+                aux cols clr colNum =
+                    let restOfCols = (drop (colNum - 1) cols)
+                        col = if null restOfCols then [] else head restOfCols
+                    in  if null restOfCols --there are no more columns to check, i.e. colNum = 8
+                        then False
+                        else if null col || colNum > 4 --if the col is empty or No right asc or dsc diags can be made after col 4
+                             then aux cols clr (colNum+1)
+                            else if or [True |x <- col, spotDiagDir x cols clr colNum (-1,1)|| spotDiagDir x cols clr colNum (1,1)]
+                                 then True
+                                 else aux cols clr (colNum+1)
+        
+                spotDiagDir :: (Int,Color) -> [[(Int, Color)]] -> Color -> Int -> Direction -> Bool--Int being the col number
+                spotDiagDir (row, color) (c:cs) clr colNum (-1,1) = --dsc
+                    if color /= clr || row < 4 --No right dsc diags can be made before row 4
                     then False
-                    else findNextSpotDsc (row, color) (c:cs) colNum 1
-                --Takes a "spot", which is a row,color tuple, the Board represented as a row,color tuple,
-                --an Int representing the column number of the spot, and an Int representing the count
-                --of the same colors in this diag in a row
-                --It then checks if the "descending" spot exists and if it's color matches the original spot
-                --Returns true or false based on this, but should it return true or false based on cnt
-
-                --we're gonna start with descending, so (-1,-1)
-                --at count to findNextSpot to count if four in a row is met and make it recursive
-                --If we made spotDiag recursive, it wouldn't check anything out side the possible 4 dsc diagonal area
-                --do this for each spot in the area
-                findNextSpotDsc :: (Int, Color) -> [[(Int, Color)]] -> Int -> Int ->  Bool
-                findNextSpotDsc (row,clr) cols colNum count = 
-                    let nextCols = drop colNum cols--what if not seven columns?
-                        nextRow = row - 1
-                        matchingSpots = [ x |x <- (head nextCols), (fst x) == nextRow]
+                    else findNextSpot (row, color) (c:cs) colNum 1 (-1,1)---add direction to findNextSpotDsc to abstract
+                spotDiagDir (row, color) (c:cs) clr colNum (1,1) = --asc
+                    if color /= clr || row > 3 --No right asc diags can be made after row 3
+                    then False
+                    else findNextSpot (row,color) (c:cs) colNum 1 (1,1)
+                spotDiagDir spot cols clr colNum _ = False --not a valid direction to check for a diaganol
+            
+                findNextSpot :: (Int, Color) -> [[(Int, Color)]] -> Int -> Int -> Direction ->  Bool
+                findNextSpot (row,clr) cols colNum count (r,c)= 
+                    let nextCols = drop colNum cols
+                        nextCol = if null nextCols then [] else head nextCols
+                        nextRow = row + r
+                        matchingSpots = [ x |x <- nextCol, (fst x) == nextRow]
                         noColsLeft = null nextCols
                         noMatchingSpots = null matchingSpots
-                        colorsMatch = snd (head matchingSpots) /= clr
+                        colorsMatch = if noMatchingSpots then False else snd (head matchingSpots) /= clr
                     in if not ((noColsLeft || noMatchingSpots) || colorsMatch)
-                       then if (count+1) >= 4 || findNextSpotDsc (nextRow, clr) cols (colNum+1) (count+1) 
+                       then if (count+1) >= 4
                             then True 
-                            else False
+                            else findNextSpot (nextRow, clr) cols (colNum+1) (count +1) (r,c)
                        else False
-                --I could have abstracted spot and findNext, but :( 
-                --Could abstract later so that if Dir == (-1,-1) then check these parameters but I don't want to
-                --Really can just use direction to abstract 
-                spotDiagAsc :: (Int,Color) -> [[(Int, Color)]] -> Color -> Int -> Bool--Int being the col number
-                spotDiagAsc (row, color) (c:cs) clr colNum = 
-                    if color /= clr || row > 3 || colNum > 3
-                    then False
-                    else findNextSpotAsc (row, color) (c:cs) colNum 1
-                findNextSpotAsc :: (Int, Color) -> [[(Int, Color)]] -> Int -> Int ->  Bool
-                findNextSpotAsc (row,clr) cols colNum count = 
-                    let nextCols = drop colNum cols--what if not seven columns?
-                        nextRow = row + 1
-                        matchingSpots = [ x |x <- (head nextCols), (fst x) == nextRow]
-                        noColsLeft = null nextCols
-                        noMatchingSpots = null matchingSpots
-                        colorsMatch = snd (head matchingSpots) /= clr
-                    in if not ((noColsLeft || noMatchingSpots) || colorsMatch)
-                       then if (count+1) >= 4 || findNextSpotAsc (nextRow, clr) cols (colNum-1) (count+1) 
-                            then True 
-                            else False
-                       else False 
-        --asc = (1,-1)
-        --dsc = (-1,-1)
-        --assume head of head of colAssList is next to be checked
-        --for each col
-        --for each thing in that col
-        --check for diag in either dir
-        --zip with row position?
+
+                --Takes a "spot", which is (row,color), the Board represented in (row,color),
+                --an Int representing the column number of the spot, an Int representing the count
+                --of the same colors in this diag in a row, and a direction
+                --It then checks if the "descending" or "ascending" spot exists and if it's color matches, if so
+                --then it increments count and if count is >= 4, then true, if count < 4 then it calls findNextSpot on the spot 
+                --just found
         
 
 
@@ -283,7 +263,7 @@ showColor (Black) = 'X'
 --Test for row:
 
 wDiagRedDsc = Board[[],[Black,Black,Red,Black,Red],[Black,Black,Red,Red],[Black,Black,Red],[Black,Red],[],[]] Red
-wDiagBlackDsc = Board [[Red,Red,Red,Red,Red,Black],[Red,Red,Red,Red,Black],[Red,Red,Red,Black],[Red,Red,Black],[],[],[]] Black
+wDiagBlackDsc = Board [[Red,Red,Black,Red,Red,Black],[Red,Black,Red,Red,Black],[Red,Black,Red,Black],[Black,Red,Black],[],[],[]] Black
 
 wDiagFail = Board [[Red],[Red],[Red],[Red],[Red],[Red],[Red]] Red
 wRR = Board [[Red,Red,Red],[Red,Black,Black],[Red,Black,Black],[Red,Black,Black],[Red,Black,Black]] Black
