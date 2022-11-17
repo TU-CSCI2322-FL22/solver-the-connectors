@@ -11,6 +11,14 @@ the board game, and tell if a player has won the board game. -}
 --The milestone description says it should return a Winner, not a Maybe Winner, but
 --what if the player whose turn it is can't win or tie, it can only lose?
 --Ask him if this is doing what it's supposed to be doing :(
+
+swapColor :: Color -> Color
+swapColor Red = Black
+swapColor Black = Red
+
+--Takes a Board, and if a win is possible it returns 'YesWinner Color', if a win isn't
+--possible but a tie is, it returns 'Tie'
+--Else, it returns that the opposite color will win
 whoWillWin :: Board -> Winner
 whoWillWin (Board cols clr) =
     let movesLeft = availableMoves (Board cols clr)
@@ -22,12 +30,11 @@ whoWillWin (Board cols clr) =
                then YesWinner clr
                else if Tie `elem` nextMvsWinLst
                     then Tie
-                    else Tie --this is where the case for a loss should be
+                    else YesWinner (swapColor clr) --this is where the case for a loss should be
     where  
         justToWinner :: Maybe Winner -> Winner
         justToWinner (Just a) = a
-        justToWinner Nothing  = Tie -- this is the case for loss, but the winner type doesn't include that
-        --seems to me like whoWillWin should return a Maybe Outcome
+
 
 
 charToColor :: Char -> Color
