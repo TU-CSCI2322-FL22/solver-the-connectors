@@ -35,6 +35,25 @@ whoWillWin (Board cols clr) =
         justToWinner :: Maybe Winner -> Winner
         justToWinner (Just a) = a
 
+bestMove :: Board -> Maybe Move
+bestMove (Board cols clr) = 
+    let possibleMvs = availableMoves (Board cols clr)
+        possibleOutcomes = [(whoWillWin (updateBoard (Board cols clr) x), x) |x <- possibleMvs]
+        winMatchesLst = [x |x <- possibleOutcomes, matchesWin x clr]
+        tieMatchesLst = if (null winMatchesLst) then [ x| x <- possibleOutcomes, matchesTie x] else []
+        --isTrue = foldr (\x y -> if(fst x == YesWinner clr) then True else y) False possibleOutcomes
+    in if winMatchesLst /= []
+       then Just (snd (head winMatchesLst))
+       else if tieMatchesLst /= []
+            then Just (snd (head tieMatchesLst))
+            else if possibleOutcomes /= []
+                 then Just (snd (head possibleOutcomes))
+                 else Nothing 
+    where 
+        matchesWin :: (Winner, Move) -> Color -> Bool
+        matchesWin (win, mv) clr = if win == (YesWinner clr) then True else False
+        matchesTie :: (Winner, Move) -> Bool
+        matchesTie (win, mv) = if win == Tie then True else False
 
 
 charToColor :: Char -> Color
