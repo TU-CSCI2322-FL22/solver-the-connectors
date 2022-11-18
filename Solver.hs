@@ -23,7 +23,7 @@ whoWillWin :: Board -> Winner
 whoWillWin (Board cols clr) =
     let movesLeft = availableMoves (Board cols clr)
         isWin = justToWinner (newCheckWinner (Board cols clr))
-    in if isWin == YesWinner clr
+    in if isWin == YesWinner clr -- do this when Nothing
        then YesWinner clr
        else let nextMvsWinLst = [whoWillWin (updateBoard (Board cols clr) x) |x <- movesLeft]
             in if YesWinner clr `elem` nextMvsWinLst
@@ -32,8 +32,13 @@ whoWillWin (Board cols clr) =
                     then Tie
                     else YesWinner (swapColor clr) --this is where the case for a loss should be
     where  
-        justToWinner :: Maybe Winner -> Winner
+        justToWinner :: Maybe Winner -> Winner --this will crash code
         justToWinner (Just a) = a
+
+
+wWW1 = whoWillWin (Board [[Black, Black],[Red, Red, Red, Black], [Black, Black], [Red, Red], [Black], [Black, Red],[Black, Red]] Red) --should return Winner Red
+wWW2 = whoWillWin (Board [[Black,Black], [Red,Red,Red,Black], [Black,Black,Black,Red],[Red,Red,Red], [Black,Black,Black, Red], [Black,Red,Red,Red, Black], [Black,Red,Red, Red, Black]] Black) --Should return Winner Red. Red will win regardless of where Black makes its next move.
+wWW2 = whoWillWin (Board [[Black, Black, Black, Red, Red], [Red, Black, White, White, Black], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Black) --Should return Winner Red. Red will win regardless of where Black makes its next move. 
 
 bestMove :: Board -> Maybe Move
 bestMove (Board cols clr) = 
@@ -41,7 +46,6 @@ bestMove (Board cols clr) =
         possibleOutcomes = [(whoWillWin (updateBoard (Board cols clr) x), x) |x <- possibleMvs]
         winMatchesLst = [x |x <- possibleOutcomes, matchesWin x clr]
         tieMatchesLst = if (null winMatchesLst) then [ x| x <- possibleOutcomes, matchesTie x] else []
-        --isTrue = foldr (\x y -> if(fst x == YesWinner clr) then True else y) False possibleOutcomes
     in if winMatchesLst /= []
        then Just (snd (head winMatchesLst))
        else if tieMatchesLst /= []
@@ -79,6 +83,7 @@ writeGame :: Board -> FilePath -> IO ()
 writeGame bd fp = 
     let str = showGame bd
     in writeFile fp str
+
 
 loadGame :: FilePath -> IO Board 
 loadGame fp = do
