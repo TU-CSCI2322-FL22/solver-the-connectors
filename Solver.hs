@@ -58,8 +58,4 @@ sg = showGame (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red,
 wg = writeGame (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) "newfile.hs"
 lg = loadGame "newfile.hs"
 pw = putWinner (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black)
-        
-
-
-
 
