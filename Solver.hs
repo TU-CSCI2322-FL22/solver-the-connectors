@@ -20,44 +20,44 @@ swapColor Black = Red
 --possible but a tie is, it returns 'Tie'
 --Else, it returns that the opposite color will win
 whoWillWin :: Board -> Winner
-whoWillWin (Board cols clr) =
-    let movesLeft = availableMoves (Board cols clr)
-        isWin = justToWinner (newCheckWinner (Board cols clr))
-    in if isWin == YesWinner clr -- do this when Nothing
-       then YesWinner clr
-       else let nextMvsWinLst = [whoWillWin (updateBoard (Board cols clr) x) |x <- movesLeft]
-            in if YesWinner clr `elem` nextMvsWinLst
-               then YesWinner clr
-               else if Tie `elem` nextMvsWinLst
-                    then Tie
-                    else YesWinner (swapColor clr) --this is where the case for a loss should be
-    where  
-        justToWinner :: Maybe Winner -> Winner --this will crash code
-        justToWinner (Just a) = a
+whoWillWin brd@(Board cols clr) =
+    let movesLeft = availableMoves brd
+        nextMvsWinLst = [whoWillWin (updateBoard brd x) |x <- movesLeft]
+        --case expression to handle Nothing and tie
+        --is this case expression right??
+    in case (newCheckWinner brd) of 
+            Just outcome -> outcome
+            Nothing -> bestOutcomeFor nextMvsWinLst clr--if isWin then return that else handle else
+    where bestOutcomeFor :: [Winner] -> Color -> Winner
+          bestOutcomeFor outcomes colr  
+               | YesWinner colr `elem` outcomes = YesWinner colr
+               | Tie `elem` outcomes = Tie
+               | otherwise = YesWinner (swapColor colr)
 
+
+bestMove :: Board -> Maybe Move
+bestMove (Board cols clr) = --make sure to check if it's already one, or possibleMvs is null
+    --use built in function
+    let possibleMvs = availableMoves (Board cols clr)
+        possibleOutcomes = [(whoWillWin (updateBoard (Board cols clr) x), x) |x <- possibleMvs]
+        --if there are no possible moves (could be a tie), return nothing 
+        --isTrue = foldr (\x y -> if(fst x == YesWinner clr) then True else y) False possibleOutcomes
+    in bestMoveFor possibleOutcomes clr
+    where 
+        bestMoveFor :: [(Winner, Move)] -> Color -> Maybe Move
+        bestMoveFor outs clr =
+            case lookup (YesWinner clr) outs of 
+                Just move -> Just move
+                Nothing -> case lookup (Tie) outs of
+                               Just move -> Just move
+                               Nothing -> Just (snd (head outs))
+      
 
 wWW1 = whoWillWin (Board [[Black, Black],[Red, Red, Red, Black], [Black, Black], [Red, Red], [Black], [Black, Red],[Black, Red]] Red) --should return Winner Red
 wWW2 = whoWillWin (Board [[Black,Black], [Red,Red,Red,Black], [Black,Black,Black,Red],[Red,Red,Red], [Black,Black,Black, Red], [Black,Red,Red,Red, Black], [Black,Red,Red, Red, Black]] Black) --Should return Winner Red. Red will win regardless of where Black makes its next move.
-wWW2 = whoWillWin (Board [[Black, Black, Black, Red, Red], [Red, Black, White, White, Black], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Black) --Should return Winner Red. Red will win regardless of where Black makes its next move. 
+--wWW2 = whoWillWin (Board [[Black, Black, Black, Red, Red], [Red, Black, White, White, Black], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Black) --Should return Winner Red. Red will win regardless of where Black makes its next move. 
 
-bestMove :: Board -> Maybe Move
-bestMove (Board cols clr) = 
-    let possibleMvs = availableMoves (Board cols clr)
-        possibleOutcomes = [(whoWillWin (updateBoard (Board cols clr) x), x) |x <- possibleMvs]
-        winMatchesLst = [x |x <- possibleOutcomes, matchesWin x clr]
-        tieMatchesLst = if (null winMatchesLst) then [ x| x <- possibleOutcomes, matchesTie x] else []
-    in if winMatchesLst /= []
-       then Just (snd (head winMatchesLst))
-       else if tieMatchesLst /= []
-            then Just (snd (head tieMatchesLst))
-            else if possibleOutcomes /= []
-                 then Just (snd (head possibleOutcomes))
-                 else Nothing 
-    where 
-        matchesWin :: (Winner, Move) -> Color -> Bool
-        matchesWin (win, mv) clr = if win == (YesWinner clr) then True else False
-        matchesTie :: (Winner, Move) -> Bool
-        matchesTie (win, mv) = if win == Tie then True else False
+
 
 
 charToColor :: Char -> Color
