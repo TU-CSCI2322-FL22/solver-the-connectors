@@ -50,15 +50,10 @@ bestMove (Board cols clr) = --make sure to check if it's already one, or possibl
                 Just move -> Just move
                 Nothing -> case lookup (Tie) outs of
                                Just move -> Just move
-                               Nothing -> Just (snd (head outs))
+                               Nothing -> case outs of
+                                            [] -> Nothing
+                                            _ -> Just (snd (head outs))
       
-
-wWW1 = whoWillWin (Board [[Black, Black],[Red, Red, Red, Black], [Black, Black], [Red, Red], [Black], [Black, Red],[Black, Red]] Red) --should return Winner Red
-wWW2 = whoWillWin (Board [[Black,Black], [Red,Red,Red,Black], [Black,Black,Black,Red],[Red,Red,Red], [Black,Black,Black, Red], [Black,Red,Red,Red, Black], [Black,Red,Red, Red, Black]] Black) --Should return Winner Red. Red will win regardless of where Black makes its next move.
---wWW2 = whoWillWin (Board [[Black, Black, Black, Red, Red], [Red, Black, White, White, Black], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Black) --Should return Winner Red. Red will win regardless of where Black makes its next move. 
-
-
-
 
 charToColor :: Char -> Color
 charToColor 'X' = Black
@@ -111,3 +106,18 @@ wg = writeGame (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red
 lg = loadGame "newfile.hs"
 pw = putWinner (Board [[Red, Red, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black)
 
+wWW1 = whoWillWin (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) --should return Winner Red
+wWW2 = whoWillWin (Board [[Red, Red, Red, Black,Black], [Black,Red,Black,Black,Red], [Red,Black,Red,Red,Red,Black],[Red,Black,Black, Black,Red], [],[Black,Black,Black, Red], [Red,Red, Red, Black]] Black) --Should return Winner Black. Black will win regardless of where Red makes its next move.
+wWW3 = whoWillWin (Board [[Black, Black, Black, Red, Red], [Red, Black, Red, Red, Black], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Red) --Should return Winner Red. Red will win regardless of where Black makes its next move. 
+wWW4 = whoWillWin (Board [[Black, Black,Red,Black,Black,Red],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red,Black,Black], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black,Red]] Red) --should return Tie.
+wWW5 = whoWillWin (Board [[Black, Black, Black, Red, Red,Black], [Red, Black, Red, Red, Black,Red], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Red) --should be Red.
+wWW6 = whoWillWin (Board [[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Red,Black,Red,Black,Red,Black], [Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black,Red]] Red) --should be a Tie.
+wWW7 = whoWillWin (Board [[Black, Red, Black, Red, Red,Red], [Red, Black, Red, Black,Black, Black], [Black,Red, Black, Red, Red, Red], [Black,Black,Black, Red, Black, Black], [Red,Red,Red,Black,Red,Black],[Black,Black,Red,Black,Red, Red],[Red,Red,Black,Red, Black,Black]] Red)-- should be a Tie.
+
+bM1 = bestMove (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
+bM2 = bestMove (Board [[Red, Red, Red, Black,Black], [Black,Red,Black,Black,Red], [Red,Black,Red,Red,Red,Black],[Red,Black,Black, Black,Red], [],[Black,Black,Black, Red], [Red,Red, Red, Black]] Black)
+bM3 = bestMove (Board [[Black, Black, Black, Red, Red], [Red, Black, Red, Red, Black], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Red)
+bM4 = bestMove (Board [[Black, Black,Red,Black,Black,Red],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red,Black,Black], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black,Red]] Red)
+bM5 = bestMove (Board [[Black, Black, Black, Red, Red,Black], [Red, Black, Red, Red, Black,Red], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Red)
+bM6 = bestMove (Board [[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Red,Black,Red,Black,Red,Black], [Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black,Red]] Red)
+bM7 = bestMove (Board [[Black, Red, Black, Red, Red,Red], [Red, Black, Red, Black,Black, Black], [Black,Red, Black, Red, Red, Red], [Black,Black,Black, Red, Black, Black], [Red,Red,Red,Black,Red,Black],[Black,Black,Red,Black,Red, Red],[Red,Red,Black,Red, Black,Black]] Red)
