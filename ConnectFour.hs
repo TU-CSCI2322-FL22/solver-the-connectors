@@ -180,7 +180,10 @@ newCheckWinner (Board cols color) =
         rowWinLs = [checkOneRow (Board cols color) x | x <- [1..6]]
     in  if or colWinLs || or rowWinLs || checkDiag (Board cols color)
         then Just (YesWinner color)
-        else Nothing
+        else 
+            if null (availableMoves (Board cols color)) --added by Mary Tish
+            then Just Tie --added by Mary Tish
+            else Nothing
     where
         checkOneCol :: Column -> Color -> Bool
         checkOneCol col clr = aux col 0
@@ -290,17 +293,14 @@ sb = showBoard (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black,
 sBB = showBoard (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black)
 testWC = checkWinner (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red], [],[],[],[]] Black) Red (2,1) 
 testAM = availableMoves (Board [[Red, Black, Red, Black, Red, Black], [Red, Black, Black, Black, Red], [Black, Red, Black], [],[],[],[]] Red) 
-
 testFC = findColor (Board [[Red, Black, Red, Black, Red, Red], [Red, Black, Black, Red, Black, Red], [Black, Red, Black, Red, Black, Red]] Black) (3,3)
-
 test2 = checkWinner (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Red, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Red, Black, Red], [Black],[Red, Black],[Black]] Black) Red (4,1)
 b2 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Red, Black, Red], [Black],[Red, Black],[Black]] Red))
-
 test3 = checkWinner (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Black, Black, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) Black (4,2)
 b3 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Black, Black, Black], [Red, Black, Black, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black))
-
 test4 = checkWinner (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) Red (1,1)
 b4 = putStrLn (showBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black))
 b4u1 = putStrLn (showBoard (updateBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) 5))
 b4u2 =  putStrLn (showBoard(updateBoard(Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Black) 6 ))
 b4u3 = putStrLn (showBoard (updateBoard (Board [[Red, Black, Black, Red, Black, Red, Black], [Black, Red, Black, Black, Black, Red, Black], [Red, Black, Red, Red, Red], [Black,Red, Red, Red, Black, Black, Red], [Black],[Red, Black],[Black]] Red) 7))
+nCW1 = newCheckWinner (Board [[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Red,Black,Red,Black,Red,Black], [Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black,Red]] Red) --should be a Tie.
