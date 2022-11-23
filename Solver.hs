@@ -23,8 +23,6 @@ whoWillWin :: Board -> Winner
 whoWillWin brd@(Board cols clr) =
     let movesLeft = availableMoves brd
         nextMvsWinLst = [whoWillWin (updateBoard brd x) |x <- movesLeft]
-        --case expression to handle Nothing and tie
-        --is this case expression right??
     in case (newCheckWinner brd) of 
             Just outcome -> outcome
             Nothing -> bestOutcomeFor nextMvsWinLst clr--if isWin then return that else handle else
