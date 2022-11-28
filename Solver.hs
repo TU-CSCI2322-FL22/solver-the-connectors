@@ -79,7 +79,15 @@ writeGame bd fp =
     let str = showGame bd
     in writeFile fp str
 
+dominatedByRed = putStrLn (showBoard (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red))
+dBR = writeGame (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) "TestDominatedByRed.hs"
 
+
+nearStart = putStrLn (showBoard(Board [[Black],[Red, Black], [Red, Black, Red], [Black, Red], [Red, Black], [Red, Red], [Black,Black]] Red))
+nS = writeGame (Board [[Black],[Red, Black], [Red, Black, Red], [Black, Red], [Red, Black], [Red, Red], [Black,Black]] Red) "TestNearStart.hs"
+
+evenMatch = putStrLn (showBoard (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Red,Black, Black], [Black, Black,Red,Red], [Red,Red,Black,Black], [Black, Black, Red, Red], [Red, Red, Black, Black]] Red))
+eMa = writeGame (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Red,Black, Black], [Black, Black,Red,Red], [Red,Red,Black,Black], [Black, Black, Red, Red], [Red, Red, Black, Black]] Red) "TestEvenMatch.hs"
 loadGame :: FilePath -> IO Board 
 loadGame fp = do
     contents <- readFile fp
