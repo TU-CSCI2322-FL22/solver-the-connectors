@@ -88,6 +88,9 @@ nS = writeGame (Board [[Black],[Red, Black], [Red, Black, Red], [Black, Red], [R
 
 evenMatch = putStrLn (showBoard (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Red,Black, Black], [Black, Black,Red,Red], [Red,Red,Black,Black], [Black, Black, Red, Red], [Red, Red, Black, Black]] Red))
 eMa = writeGame (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Red,Black, Black], [Black, Black,Red,Red], [Red,Red,Black,Black], [Black, Black, Red, Red], [Red, Red, Black, Black]] Red) "TestEvenMatch.hs"
+
+nearEnd = putStrLn (showBoard (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black))
+nE = writeGame (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black) "TestNearEnd.hs"
 loadGame :: FilePath -> IO Board 
 loadGame fp = do
     contents <- readFile fp
