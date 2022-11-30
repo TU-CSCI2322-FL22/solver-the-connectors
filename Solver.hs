@@ -77,7 +77,6 @@ writeGame bd fp =
     let str = showGame bd
     in writeFile fp str
 
-
 loadGame :: FilePath -> IO Board 
 loadGame fp = do
     contents <- readFile fp
@@ -95,6 +94,10 @@ putWinner bd =
         justval :: Winner -> String
         justval (YesWinner x) = [showColor(x)]
         justval (Tie) = "no one"
+
+data Flag = Help | Winr | Mv Move | Depth String | Verbose deriving (Eq, Show)
+
+
 
 
 --Tester Code Below--
@@ -119,3 +122,18 @@ bM4 = bestMove (Board [[Black, Black,Red,Black,Black,Red],[Black, Red, Red, Blac
 bM5 = bestMove (Board [[Black, Black, Black, Red, Red,Black], [Red, Black, Red, Red, Black,Red], [Black, Red, Black, Black, Black, Red], [Black, Red, Red, Red, Black], [],[Red, Red, Red, Black], [Black,Black,Black,Red]] Red)
 bM6 = bestMove (Board [[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Red,Black,Red,Black,Red,Black], [Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black, Red],[Black, Red, Black, Red, Black,Red]] Red)
 bM7 = bestMove (Board [[Black, Red, Black, Red, Red,Red], [Red, Black, Red, Black,Black, Black], [Black,Red, Black, Red, Red, Red], [Black,Black,Black, Red, Black, Black], [Red,Red,Red,Black,Red,Black],[Black,Black,Red,Black,Red, Red],[Red,Red,Black,Red, Black,Black]] Red)
+
+
+--Boards--
+dominatedByRed = putStrLn (showBoard (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red))
+dBR = writeGame (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) "TestDominatedByRed.hs"
+
+
+nearStart = putStrLn (showBoard(Board [[Black],[Red, Black], [Red, Black, Red], [Black, Red], [Red, Black], [Red, Red], [Black,Black]] Red))
+nS = writeGame (Board [[Black],[Red, Black], [Red, Black, Red], [Black, Red], [Red, Black], [Red, Red], [Black,Black]] Red) "TestNearStart.hs"
+
+evenMatch = putStrLn (showBoard (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Red,Black, Black], [Black, Black,Red,Red], [Red,Red,Black,Black], [Black, Black, Red, Red], [Red, Red, Black, Black]] Red))
+eMa = writeGame (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Red,Black, Black], [Black, Black,Red,Red], [Red,Red,Black,Black], [Black, Black, Red, Red], [Red, Red, Black, Black]] Red) "TestEvenMatch.hs"
+
+nearEnd = putStrLn (showBoard (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black))
+nE = writeGame (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black) "TestNearEnd.hs"
