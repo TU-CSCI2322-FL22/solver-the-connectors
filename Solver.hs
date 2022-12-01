@@ -125,7 +125,33 @@ getDepth ((Depth x):_) =
         Just depth -> depth
     getDepth (_:flags) = getDepth flags
 
+main :: IO ()
+main =
+  do args <- getArgs
+     let (flags, inputs, error) = getOpt Permute options args
+     let fname = if null inputs then "default.txt" else head inputs
+     fileContents <- readFile fname
+     let fc = lines fileContents
+     if Help `elem` flags || (not $ null error)
+     then putStrLn $ usageInfo "Usage: ConnectFour [options] [file]" options
+     else do
+       index <- getStart flags
+       (chooseAction flags) index fc
 
+chooseAction :: [Flag] -> Int -> [String] -> IO ()
+chooseAction flags 
+  | Winner `elem` flags = tellBestMove fc
+  | Move `elem` flags = 
+  | Depth `elem` flags = 
+  | Verbose `elem` flags = 
+  | otherwise = 
+
+tellBestMove :: [Board] -> IO ()
+tellBestMove bd = do
+    let bm = bestMove bd
+    if bm == Nothing 
+    then putStrLn("No best move.")
+    else putStrLn("The best move is " ++ show(bm) ++ ".")
 
 --Tester Code Below--
 rg = readGame "X000X00\n0XX0X0\nX0X0X0\n\n\n\n\n"
