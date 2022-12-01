@@ -97,8 +97,33 @@ putWinner bd =
         justval (YesWinner x) = [showColor(x)]
         justval (Tie) = "no one"
 
-data Flag = Help | Winr | Mv Move | Depth String | Verbose deriving (Eq, Show)
+data Flag = Help | Winner | Move Move | Depth String | Verbose deriving (Eq, Show)
 
+options :: [OptDesc Flag]
+options = [Option ['h'] ["help"] (NoArg Help) "Print usage information and exit."
+          , Option ['w'] ["winner"] (NoArg Winner) "Prints the best move using an exhaustive search (no cut off depth)."
+          , Option ['m'] ["move"] (RegArg Move m) "Make m and print out the resulting board, in the input format, to stdout. 
+									               The move should be 1-indexed. If a move requires multiple values, the move will
+									               be a tuple of numbers separated by a comma with no space."
+          , Option ['d'] ["depth"] (RegArg Depth "#") "Uses # as a cutoff depth, instead of the default."
+          , Option ['v'] ["verbose"] (NoArg Verbose) "Output both the move and a description of how good it is: win, lose, tie, or a rating."
+          ]
+
+getMove :: [Flag] -> Move
+getMove [] = 1
+getMove ((Move x):_) =
+    case readMaybe x of 
+        Nothing -> error "Invalid input to move flag"
+        Just move -> move
+    getMove (_:flags) = getMove flags
+
+getDepth :: [Flag] -> Int
+getDepth [] = 1
+getDepth ((Depth x):_) =
+    case readMaybe x of 
+        Nothing -> error "Invalid input to depth flag"
+        Just depth -> depth
+    getDepth (_:flags) = getDepth flags
 
 
 
