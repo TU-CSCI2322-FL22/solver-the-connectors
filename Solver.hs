@@ -2,6 +2,12 @@ module Solver where
 import ConnectFour
 import Data.List
 import Data.List.Split
+import System.Console.GetOpt
+import Data.Maybe
+import Text.Read (readMaybe)
+import System.IO
+import System.Environment
+import Data.Char
 
 
 ------------------------------------------MILESTONE TWO-----------------------------------------------
@@ -97,15 +103,13 @@ putWinner bd =
         justval (YesWinner x) = [showColor(x)]
         justval (Tie) = "no one"
 
-data Flag = Help | Winner | Move Move | Depth String | Verbose deriving (Eq, Show)
+data Flag = Help | Winner | Move String | Depth String | Verbose deriving (Eq, Show)
 
-options :: [OptDesc Flag]
+options :: [OptDescr Flag]
 options = [Option ['h'] ["help"] (NoArg Help) "Print usage information and exit."
           , Option ['w'] ["winner"] (NoArg Winner) "Prints the best move using an exhaustive search (no cut off depth)."
-          , Option ['m'] ["move"] (RegArg Move "m") "Make m and print out the resulting board, in the input format, to stdout. 
-									               The move should be 1-indexed. If a move requires multiple values, the move will
-									               be a tuple of numbers separated by a comma with no space."
-          , Option ['d'] ["depth"] (RegArg Depth "#") "Uses # as a cutoff depth, instead of the default."
+          , Option ['m'] ["move"] (ReqArg Move "m") "Make m and print out the resulting board, in the input format, to stdout. The move should be 1-indexed. If a move requires multiple values, the move will be a tuple of numbers separated by a comma with no space."
+          , Option ['d'] ["depth"] (ReqArg Depth "#") "Uses # as a cutoff depth, instead of the default."
           , Option ['v'] ["verbose"] (NoArg Verbose) "Output both the move and a description of how good it is: win, lose, tie, or a rating."
           ]
 
@@ -115,7 +119,7 @@ getMove ((Move x):_) =
     case readMaybe x of 
         Nothing -> error "Invalid input to move flag"
         Just move -> Just move
-    getMove (_:flags) = getMove flags
+getMove (_:flags) = getMove flags
 
 getDepth :: [Flag] -> Int
 getDepth [] = 3
@@ -123,38 +127,39 @@ getDepth ((Depth x):_) =
     case readMaybe x of 
         Nothing -> error "Invalid input to depth flag"
         Just depth -> depth
-    getDepth (_:flags) = getDepth flags
+getDepth (_:flags) = getDepth flags
 
 main :: IO ()
-main =
+main = 
   do args <- getArgs
      let (flags, inputs, error) = getOpt Permute options args
      let fname = if null inputs then "default.txt" else head inputs
-     let bd = loadBoard fname
+     contents <- readFile fname
+     let bd = readGame contents
+     --let bd = loadGame fname
      if Help `elem` flags || (not $ null error)
      then putStrLn $ usageInfo "Usage: ConnectFour [options] [file]" options
      else do
-       (chooseAction flags bd)
+        (chooseAction flags bd)
 
 chooseAction :: [Flag] -> Board -> IO ()
 chooseAction flags bd
-  | Winner `elem` flags = tellBestMove fc
+  | Winner `elem` flags = tellBestMove bd
   | checkForMoveInFlags flags = makeAndTellMove bd flags
   | Winner `notElem` flags = tellMoveWithCutOffDepth bd flags 
   | otherwise = tellVerbose bd -- if Verbose `elem` flags == true 
 
-tellMoveWithCutOffDepth :: Board -> [Flags] -> IO ()
-getDepthInFlags flags = do
+tellMoveWithCutOffDepth :: Board -> [Flag] -> IO ()
+tellMoveWithCutOffDepth bd flags = do
     let gd = getDepth flags
-    putStrLn (("The best move is " ++ show(fromJust(cutOffSearch gd bd)) ++ ".")) --cutOffSearch
+    putStrLn ("hi") --("The best move is " ++ show(fromJust(cutOffSearch gd bd)) ++ ".")) --cutOffSearch
     
 tellVerbose :: Board -> IO () 
 tellVerbose bd = 
     let bm = bestMove bd
-    if bm == Nothing 
-    then putStrLn("No best move.")
-    else
-        putStrLn("The best move is " ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluateMove (fromJust bm)) ++ ".")
+    in if bm == Nothing 
+       then putStrLn("No best move.")
+       else putStrLn("The best move is " )-- ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluateMove (fromJust bm)) ++ ".")
 
 tellBestMove :: Board -> IO ()
 tellBestMove bd = do
@@ -163,17 +168,17 @@ tellBestMove bd = do
     then putStrLn("No best move.")
     else putStrLn("The best move is " ++ show(fromJust(bm)) ++ ".")
 
-makeAndTellMove :: Board -> [Flags] -> IO ()
+makeAndTellMove :: Board -> [Flag] -> IO ()
 makeAndTellMove bd flags = do
     let gm = getMove flags
-    let newbd = updateBoard bd (fromJust(gm))
+    let newbd = updateBoard bd (fromJust (gm))
     putStrLn (showGame newbd)
 
-checkForMoveInFlags :: [Flags] -> Bool
+checkForMoveInFlags :: [Flag] -> Bool
 checkForMoveInFlags flags = 
     let gm = getMove flags
-    in if gm == Nothing then false
-       else true
+    in if gm == Nothing then False
+       else True
 
 --Tester Code Below--
 rg = readGame "X000X00\n0XX0X0\nX0X0X0\n\n\n\n\n"
