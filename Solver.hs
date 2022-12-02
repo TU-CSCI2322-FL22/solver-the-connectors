@@ -137,9 +137,15 @@ bestMove (Board cols clr) = --make sure to check if it's already one, or possibl
         --isTrue = foldr (\x y -> if(fst x == YesWinner clr) then True else y) False possibleOutcomes
     in bestMoveFor possibleOutcomes clr
     where 
-        bestMo]
-        aux (x:xs) = [showColor(c) | c <- x]++ '\n': aux xs
-                              _ -> Just (snd (head outs))
+        bestMoveFor :: [(Winner, Move)] -> Color -> Maybe Move
+        bestMoveFor outs clr =
+            case lookup (YesWinner clr) outs of 
+                Just move -> Just move
+                Nothing -> case lookup (Tie) outs of
+                               Just move -> Just move
+                               Nothing -> case outs of
+                                            [] -> Nothing
+                                            _ -> Just (snd (head outs))
       
 
 charToColor :: Char -> Color
@@ -183,10 +189,6 @@ putWinner bd =
         justval :: Winner -> String
         justval (YesWinner x) = [showColor(x)]
         justval (Tie) = "no one"
-
---TODO: check if board needs to write to file.
---      return error for invalid flags.
---      how to make executable file to test flags 
 
 data Flag = Help | Winner | Move String | Depth String | Verbose deriving (Eq, Show)
 
