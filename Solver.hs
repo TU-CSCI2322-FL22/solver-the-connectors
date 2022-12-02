@@ -222,49 +222,36 @@ main =
      let fname = if null inputs then "default.txt" else head inputs
      contents <- readFile fname
      let bd = readGame contents
-     --let bd = loadGame fname
      if Help `elem` flags || (not $ null error)
      then putStrLn $ usageInfo "Usage: ConnectFour [options] [file]" options
      else do
         (chooseAction flags bd)
 
 chooseAction :: [Flag] -> Board -> IO ()
-chooseAction flags bd --potentially modify order
-  | Winner `elem` flags = tellBestMove bd
-  | checkForMoveInFlags flags = makeAndTellMove bd flags
-  | Verbose `elem` flags = tellVerbose bd
-  | Winner `notElem` flags = tellMoveWithCutOffDepth bd flags --need to modify this
+chooseAction flags bd 
+  | Winner `elem` flags = tellBestMove bd flags 
+  | checkForMoveInFlags flags = makeAndTellMove bd flags 
+  | Winner `notElem` flags = tellMoveWithCutOffDepth bd flags 
   | otherwise = return ()
 
-ca = chooseAction [Depth "2"] (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
 --think i need to write board to the file (????)
 
 tellMoveWithCutOffDepth :: Board -> [Flag] -> IO ()
 tellMoveWithCutOffDepth bd flags = do
     let gd = getDepth flags
-    putStrLn ("The best move isss " ++ show(fromJust(cutOffBestMove bd gd)) ++ ".") --cutOffSearch
+    if (Verbose `elem` flags) 
+    then putStrLn("The best move is " ++ show(fromJust(cutOffBestMove bd gd)) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
+    else putStrLn ("The best move is " ++ show(fromJust(cutOffBestMove bd gd)) ++ ".")
 
-tmwcd = tellMoveWithCutOffDepth (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) [Depth "4"]
-
-    
-tellVerbose :: Board -> IO () 
-tellVerbose bd = 
-    let bm = bestMove bd
-    in if bm == Nothing 
-       then putStrLn("No best move.")
-       else putStrLn("The besttt move is " ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
-
-tv = tellVerbose (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
-
-tellBestMove :: Board -> IO ()
-tellBestMove bd = do
+tellBestMove :: Board -> [Flag] -> IO ()
+tellBestMove bd flags = do
     let bm = bestMove bd
     if bm == Nothing 
     then putStrLn("No best move.")
-    else putStrLn("The bbbest move is " ++ show(fromJust(bm)) ++ ".")
-
-tbm = tellBestMove (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
-
+    else 
+        if (Verbose `elem` flags)
+        then putStrLn("The best move is " ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
+        else putStrLn("The best move is " ++ show(fromJust(bm)) ++ ".")
 
 makeAndTellMove :: Board -> [Flag] -> IO ()
 makeAndTellMove bd flags = do
@@ -315,3 +302,8 @@ eMa = writeGame (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Re
 
 nearEnd = putStrLn (showBoard (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black))
 nE = writeGame (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black) "TestNearEnd.hs"
+
+
+ca = chooseAction [Depth "4", Verbose] (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black)
+tbm = tellBestMove (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
+tmwcd = tellMoveWithCutOffDepth (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) [Depth "4"]
