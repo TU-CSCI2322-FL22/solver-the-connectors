@@ -225,7 +225,6 @@ chooseAction flags bd
   | Winner `notElem` flags = tellMoveWithCutOffDepth bd flags 
   | otherwise = return ()
 
---think i need to write board to the file (????)
 
 tellMoveWithCutOffDepth :: Board -> [Flag] -> IO ()
 tellMoveWithCutOffDepth bd flags = do
@@ -295,6 +294,7 @@ nearEnd = putStrLn (showBoard (Board [[Black,Black,Black, Red], [Red, Red, Red, 
 nE = writeGame (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black) "TestNearEnd.hs"
 
 
+--IO Tests--
 ca = chooseAction [Depth "4", Verbose] (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black)
 tbm = tellBestMove (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
 tmwcd = tellMoveWithCutOffDepth (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) [Depth "4"]

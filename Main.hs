@@ -10,15 +10,15 @@ import System.Environment
 import Data.Char
 
 import Solver
+
 main :: IO ()
 main = 
   do args <- getArgs
      let (flags, inputs, error) = getOpt Permute options args
-     --if "winner" `elem` flags then putStrLn ("hello") else putStrLn("hi")
      let fname = if null inputs then "TestEvenMatch.hs" else head inputs
      contents <- readFile fname
      let bd = readGame contents
-     if Help `elem` flags || (not $ null error) -- ||InvalidFlags
-     then putStrLn $ usageInfo "Usage: ConnectFour [options] [file]" options
+     if Help `elem` flags || (not $ null error)
+     then putStrLn $ unlines error ++ usageInfo "Usage: ConnectFour [options] [file]" options
      else do
         (chooseAction flags bd)
