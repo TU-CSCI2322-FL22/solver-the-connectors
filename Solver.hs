@@ -23,7 +23,7 @@ swapColor Black = Red
 --The range of the score is 60 to -60, where 60 is a win for player one, -60 is a win for player two, and
 --0 is a tie.
 
-
+--fixed score: Red is 60 black is -60
 cutOffSearch :: Board -> Int -> Score --return highest score
 cutOffSearch brd@(Board cols clr) cutDepth = 
     let movesLeft = availableMoves brd
@@ -36,6 +36,7 @@ cutOffSearch brd@(Board cols clr) cutDepth =
             Nothing -> if cutDepth == 0 
                        then evaluate brd
                        else maximum [cutOffSearch (updateBoard brd x) (cutDepth - 1) |x <- movesLeft]
+                       --maximum won't work when scores are fixed, because then highest score for black would be -60
 
 --search for a move that forces the game to the best board state within the cut-off depth
 
@@ -135,15 +136,9 @@ bestMove (Board cols clr) = --make sure to check if it's already one, or possibl
         --isTrue = foldr (\x y -> if(fst x == YesWinner clr) then True else y) False possibleOutcomes
     in bestMoveFor possibleOutcomes clr
     where 
-        bestMoveFor :: [(Winner, Move)] -> Color -> Maybe Move
-        bestMoveFor outs clr =
-            case lookup (YesWinner clr) outs of 
-                Just move -> Just move
-                Nothing -> case lookup (Tie) outs of
-                               Just move -> Just move
-                               Nothing -> case outs of
-                                            [] -> Nothing
-                                            _ -> Just (snd (head outs))
+        bestMo]
+        aux (x:xs) = [showColor(c) | c <- x]++ '\n': aux xs
+                              _ -> Just (snd (head outs))
       
 
 charToColor :: Char -> Color
