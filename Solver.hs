@@ -22,6 +22,94 @@ swapColor :: Color -> Color
 swapColor Red = Black
 swapColor Black = Red
 
+--The range of the score is 60 to -60, where 60 is a win for player one, -60 is a win for player two, and
+--0 is a tie.
+type Score = Int
+--cutOffDepth returns Move
+--DON't FORGET TO UPDATEBOARD
+--should return Maybe Move? (or Move)
+cutOffSearch :: Board -> Int -> Score --return highest score
+cutOffSearch brd@(Board cols clr) cutDepth = 
+    let movesLeft = availableMoves brd
+    in case (newCheckWinner brd) of 
+            Just outcome -> if outcome == YesWinner clr 
+                            then 60 
+                            else if outcome == Tie 
+                                 then 0 
+                                 else -60
+            Nothing -> if cutDepth == 0 
+                       then evaluate brd
+                       else maximum [cutOffSearch (updateBoard brd x) (cutDepth - 1) |x <- movesLeft]
+
+--search for a move that forces the game to the best board state within the cut-off depth
+cutOffBestMove :: Board -> Int -> Maybe Move
+cutOffBestMove brd@(Board cols clr) depth = 
+    let possibleMvs = availableMoves (Board cols clr)
+        possibleOutcomes = [(cutOffSearch (updateBoard (Board cols clr) x) depth, x) |x <- possibleMvs]
+        --if there are no possible moves (could be a tie), return nothing 
+        --isTrue = foldr (\x y -> if(fst x == YesWinner clr) then True else y) False possibleOutcomes
+    in bestMoveFor possibleOutcomes --just fold to return the move with the highest score
+    where bestMoveFor :: [(Score, Move)] -> Maybe Move
+          bestMoveFor outs =
+                case lookup 60 outs of 
+                  Just move -> Just move
+                  Nothing -> snd (foldl (\acc (x,y) -> if x > fst acc 
+                                              then (x, Just y)
+                                              else acc ) (-60, Nothing) outs)
+                    
+
+evaluate :: Board -> Int 
+evaluate brd@(Board cols clr) =
+    let isWonByOne = newCheckWinner brd
+        oppClr = swapColor clr
+    in if isWonByOne == Just (YesWinner clr) 
+       then 60
+       else if isWonByOne == Just Tie 
+            then 0
+            else if newCheckWinner (Board cols oppClr) == Just (YesWinner oppClr) 
+                 then -60
+                else findBoardScore brd
+    where findBoardScore :: Board -> Int
+          findBoardScore brd@(Board cols clr) = 
+            let oppClr = swapColor clr
+                oppBoard = Board cols oppClr
+                scoreOne = sum [ countAllDirs brd (length (getColumn brd x), x)  | x <- [1..7]]
+                scoreTwo = sum [ countAllDirs oppBoard (length (getColumn oppBoard x), x)  | x <- [1..7]]
+            in if scoreOne > scoreTwo 
+               then scoreOne
+               else if scoreTwo > scoreOne 
+                    then -scoreTwo
+                    else 0
+          countAllDirs :: Board -> Coordinate -> Int
+          countAllDirs brd@(Board cols clr) coord =
+            let dirs = [(-1,1),(1,1),(-1,0),(0,1)]--rtDsc, rtAsc, down, right
+            in sum [dirCounter brd coord x | x <- dirs]
+            
+ --Evaluate will take a board. It will check if either color has one the game, then it
+          --will only check for wins in valid directions starting from the top most piece in 
+          --each column.
+          --If four in a row are found for the color passed in with the board (player one), it will 
+          --return 4 and stop checking. Else, it will find the highest number of consecutive pieces for Player
+          --One and Player Two. It will return the number with the greatest value.
+          --The return range is 4 to -4.
+--Assumes we're checking for color cl
+--ACTUALLY NO LIMITATIONS BECAUSE WE'RE NOT JUST CHECKING FOR FOUR IN A ROW BUT JUST A COUNT
+dirCounter :: Board -> Coordinate -> Direction -> Int
+dirCounter brd@(Board cols cl) (row, col) (mvR, mvC) =
+    aux brd (row,col) (mvR, mvC) 0
+    where
+        aux :: Board -> Coordinate -> Direction -> Int -> Int
+        aux (Board cols cl) (row, col) (mvR, mvC) 4 = 4 
+        aux (Board cols cl) (row, col) (mvR, mvC) cnt =
+            let
+                nextPos = (row + mvR, col + mvC)
+                nextPosCol = findColor (Board cols cl) nextPos
+            in
+                if nextPosCol == Just cl
+                then countDir (Board cols cl) cl nextPos (mvR, mvC) (cnt + 1)
+                else cnt
+
+
 --Takes a Board, and if a win is possible it returns 'YesWinner Color', if a win isn't
 --possible but a tie is, it returns 'Tie'
 --Else, it returns that the opposite color will win

@@ -127,8 +127,8 @@ findColor (Board cols clr) (x,y) =
                                            Just Black -> (getColorAtRow col x)
                                            Nothing -> Nothing
 
+--assumes we're searching for color passed in with the board (cl)
 
-    
 --takes board, Color we're checking for, coord of piece we're "at", direction we're going in, and a count
 --returns a count of how many in a row of the color were checking there is in that Direction
 countDir :: Board -> Color -> Coordinate -> Direction -> Int -> Int
