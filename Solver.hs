@@ -141,14 +141,20 @@ chooseAction flags bd
   | Winner `elem` flags = tellBestMove fc
   | checkForMoveInFlags flags = makeAndTellMove bd flags
   | Winner `notElem` flags = tellMoveWithCutOffDepth bd flags 
-  | Verbose `elem` flags = 
-  | otherwise = 
+  | otherwise = tellVerbose bd -- if Verbose `elem` flags == true 
 
 tellMoveWithCutOffDepth :: Board -> [Flags] -> IO ()
 getDepthInFlags flags = do
     let gd = getDepth flags
     putStrLn (("The best move is " ++ show(fromJust(cutOffSearch gd bd)) ++ ".")) --cutOffSearch
     
+tellVerbose :: Board -> IO () 
+tellVerbose bd = 
+    let bm = bestMove bd
+    if bm == Nothing 
+    then putStrLn("No best move.")
+    else
+        putStrLn("The best move is " ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluateMove (fromJust bm)) ++ ".")
 
 tellBestMove :: Board -> IO ()
 tellBestMove bd = do
