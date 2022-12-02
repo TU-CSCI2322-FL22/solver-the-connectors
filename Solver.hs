@@ -10,7 +10,6 @@ import System.Environment
 import Data.Char
 
 
-
 ------------------------------------------MILESTONE TWO-----------------------------------------------
 {-For this milestone, you will need to be able to represent the board game in Haskell, make moves on 
 the board game, and tell if a player has won the board game. -}
@@ -216,8 +215,6 @@ getDepth ((Depth x):_) =
         Just depth -> depth
 getDepth (_:flags) = getDepth flags
 
-
-
 chooseAction :: [Flag] -> Board -> IO ()
 chooseAction flags bd 
   | Winner `elem` flags = tellBestMove bd flags 
@@ -229,25 +226,25 @@ chooseAction flags bd
 tellMoveWithCutOffDepth :: Board -> [Flag] -> IO ()
 tellMoveWithCutOffDepth bd flags = do
     let gd = getDepth flags
+    let Just x = cutOffBestMove bd gd
     if (Verbose `elem` flags) 
-    then putStrLn("The best move is " ++ show(fromJust(cutOffBestMove bd gd)) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
-    else putStrLn ("The best move is " ++ show(fromJust(cutOffBestMove bd gd)) ++ ".")
+    then putStrLn("The best move is " ++ show(x) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
+    else putStrLn ("The best move is " ++ show(x) ++ ".")
 
 tellBestMove :: Board -> [Flag] -> IO ()
 tellBestMove bd flags = do
-    let bm = bestMove bd
-    if bm == Nothing 
-    then putStrLn("No best move.")
-    else 
-        if (Verbose `elem` flags)
-        then putStrLn("The best move is " ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
-        else putStrLn("The best move is " ++ show(fromJust(bm)) ++ ".")
+    case bestMove bd of 
+        Nothing -> putStrLn("No best move.")
+        Just x -> if (Verbose `elem` flags)
+                  then putStrLn("The best move is " ++ show(x) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
+                  else putStrLn("The best move is " ++ show(x) ++ ".")
+        
 
 makeAndTellMove :: Board -> [Flag] -> IO ()
 makeAndTellMove bd flags = do
-    let gm = getMove flags
-    let newbd = updateBoard bd (fromJust (gm))
-    putStrLn (showGame newbd)
+    case getMove flags of 
+        Nothing -> putStrLn ("No move to be made.")
+        Just x -> putStrLn (showGame(updateBoard bd(x)))
 
 checkForMoveInFlags :: [Flag] -> Bool
 checkForMoveInFlags flags = 
@@ -295,6 +292,7 @@ nE = writeGame (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], 
 
 
 --IO Tests--
-ca = chooseAction [Depth "4", Verbose] (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black)
-tbm = tellBestMove (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
+ca = chooseAction [Move "2"] (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black)
+tbm = tellBestMove (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) [Depth "2"]
 tmwcd = tellMoveWithCutOffDepth (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) [Depth "4"]
+mm = makeAndTellMove (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black) [Move "3"]
