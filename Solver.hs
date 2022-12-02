@@ -14,9 +14,7 @@ import Data.Char
 {-For this milestone, you will need to be able to represent the board game in Haskell, make moves on 
 the board game, and tell if a player has won the board game. -}
 
---The milestone description says it should return a Winner, not a Maybe Winner, but
---what if the player whose turn it is can't win or tie, it can only lose?
---Ask him if this is doing what it's supposed to be doing :(
+type Score = Int
 
 swapColor :: Color -> Color
 swapColor Red = Black
@@ -24,10 +22,8 @@ swapColor Black = Red
 
 --The range of the score is 60 to -60, where 60 is a win for player one, -60 is a win for player two, and
 --0 is a tie.
-type Score = Int
---cutOffDepth returns Move
---DON't FORGET TO UPDATEBOARD
---should return Maybe Move? (or Move)
+
+
 cutOffSearch :: Board -> Int -> Score --return highest score
 cutOffSearch brd@(Board cols clr) cutDepth = 
     let movesLeft = availableMoves brd
@@ -42,6 +38,7 @@ cutOffSearch brd@(Board cols clr) cutDepth =
                        else maximum [cutOffSearch (updateBoard brd x) (cutDepth - 1) |x <- movesLeft]
 
 --search for a move that forces the game to the best board state within the cut-off depth
+
 cutOffBestMove :: Board -> Int -> Maybe Move
 cutOffBestMove brd@(Board cols clr) depth = 
     let possibleMvs = availableMoves (Board cols clr)
@@ -86,14 +83,15 @@ evaluate brd@(Board cols clr) =
             in sum [dirCounter brd coord x | x <- dirs]
             
  --Evaluate will take a board. It will check if either color has one the game, then it
-          --will only check for wins in valid directions starting from the top most piece in 
-          --each column.
-          --If four in a row are found for the color passed in with the board (player one), it will 
-          --return 4 and stop checking. Else, it will find the highest number of consecutive pieces for Player
-          --One and Player Two. It will return the number with the greatest value.
-          --The return range is 4 to -4.
---Assumes we're checking for color cl
---ACTUALLY NO LIMITATIONS BECAUSE WE'RE NOT JUST CHECKING FOR FOUR IN A ROW BUT JUST A COUNT
+ --will only check for wins in valid directions starting from the top most piece in 
+ --each column.
+ --If four in a row are found for the color passed in with the board (player one), it will 
+ --return 60 and stop checking. Else, it will find the highest number of consecutive pieces for Player 
+ --One and Player Two. It will return the number with the greatest value.
+ --The return range is 60 to -60.
+ --Assumes we're checking for color cl
+ 
+
 dirCounter :: Board -> Coordinate -> Direction -> Int
 dirCounter brd@(Board cols cl) (row, col) (mvR, mvC) =
     aux brd (row,col) (mvR, mvC) 0
@@ -113,6 +111,7 @@ dirCounter brd@(Board cols cl) (row, col) (mvR, mvC) =
 --Takes a Board, and if a win is possible it returns 'YesWinner Color', if a win isn't
 --possible but a tie is, it returns 'Tie'
 --Else, it returns that the opposite color will win
+
 whoWillWin :: Board -> Winner
 whoWillWin brd@(Board cols clr) =
     let movesLeft = availableMoves brd
