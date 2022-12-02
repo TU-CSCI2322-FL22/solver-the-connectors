@@ -10,6 +10,7 @@ import System.Environment
 import Data.Char
 
 
+
 ------------------------------------------MILESTONE TWO-----------------------------------------------
 {-For this milestone, you will need to be able to represent the board game in Haskell, make moves on 
 the board game, and tell if a player has won the board game. -}
@@ -189,6 +190,10 @@ putWinner bd =
         justval (YesWinner x) = [showColor(x)]
         justval (Tie) = "no one"
 
+--TODO: check if board needs to write to file.
+--      return error for invalid flags.
+--      how to make executable file to test flags 
+
 data Flag = Help | Winner | Move String | Depth String | Verbose deriving (Eq, Show)
 
 options :: [OptDescr Flag]
@@ -199,7 +204,7 @@ options = [Option ['h'] ["help"] (NoArg Help) "Print usage information and exit.
           , Option ['v'] ["verbose"] (NoArg Verbose) "Output both the move and a description of how good it is: win, lose, tie, or a rating."
           ]
 
-getMove :: [Flag] -> Maybe Move --modify for maybe
+getMove :: [Flag] -> Maybe Move
 getMove [] = Nothing
 getMove ((Move x):_) =
     case readMaybe x of 
@@ -215,17 +220,7 @@ getDepth ((Depth x):_) =
         Just depth -> depth
 getDepth (_:flags) = getDepth flags
 
-main :: IO ()
-main = 
-  do args <- getArgs
-     let (flags, inputs, error) = getOpt Permute options args
-     let fname = if null inputs then "default.txt" else head inputs
-     contents <- readFile fname
-     let bd = readGame contents
-     if Help `elem` flags || (not $ null error)
-     then putStrLn $ usageInfo "Usage: ConnectFour [options] [file]" options
-     else do
-        (chooseAction flags bd)
+
 
 chooseAction :: [Flag] -> Board -> IO ()
 chooseAction flags bd 

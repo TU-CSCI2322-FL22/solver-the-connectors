@@ -1,6 +1,6 @@
 # Commands:
 
-name := foo
+name := connectfour
 
 .PHONY: build init test clean doc deploy stage
 
