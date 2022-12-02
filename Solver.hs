@@ -229,30 +229,42 @@ main =
         (chooseAction flags bd)
 
 chooseAction :: [Flag] -> Board -> IO ()
-chooseAction flags bd
+chooseAction flags bd --potentially modify order
   | Winner `elem` flags = tellBestMove bd
   | checkForMoveInFlags flags = makeAndTellMove bd flags
-  | Winner `notElem` flags = tellMoveWithCutOffDepth bd flags 
-  | otherwise = tellVerbose bd -- if Verbose `elem` flags == true 
+  | Verbose `elem` flags = tellVerbose bd
+  | Winner `notElem` flags = tellMoveWithCutOffDepth bd flags --need to modify this
+  | otherwise = return ()
+
+ca = chooseAction [Depth "2"] (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
+--think i need to write board to the file (????)
 
 tellMoveWithCutOffDepth :: Board -> [Flag] -> IO ()
 tellMoveWithCutOffDepth bd flags = do
     let gd = getDepth flags
-    putStrLn ("hi") --("The best move is " ++ show(fromJust(cutOffSearch gd bd)) ++ ".")) --cutOffSearch
+    putStrLn ("The best move isss " ++ show(fromJust(cutOffBestMove bd gd)) ++ ".") --cutOffSearch
+
+tmwcd = tellMoveWithCutOffDepth (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) [Depth "4"]
+
     
 tellVerbose :: Board -> IO () 
 tellVerbose bd = 
     let bm = bestMove bd
     in if bm == Nothing 
        then putStrLn("No best move.")
-       else putStrLn("The best move is " )-- ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluateMove (fromJust bm)) ++ ".")
+       else putStrLn("The besttt move is " ++ show(fromJust(bm)) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
+
+tv = tellVerbose (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
 
 tellBestMove :: Board -> IO ()
 tellBestMove bd = do
     let bm = bestMove bd
     if bm == Nothing 
     then putStrLn("No best move.")
-    else putStrLn("The best move is " ++ show(fromJust(bm)) ++ ".")
+    else putStrLn("The bbbest move is " ++ show(fromJust(bm)) ++ ".")
+
+tbm = tellBestMove (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red)
+
 
 makeAndTellMove :: Board -> [Flag] -> IO ()
 makeAndTellMove bd flags = do
