@@ -20,7 +20,7 @@ swapColor :: Color -> Color
 swapColor Red = Black
 swapColor Black = Red
 
---The range of the score is 60 to -60, where 60 is a win for player one, -60 is a win for player two, and
+--The range of the score is 60 to -60, where 60 is a win for the red player, -60 is a win for the black player, and
 --0 is a tie.
 
 --fixed score: Red is 60 black is -60
@@ -29,16 +29,15 @@ cutOffSearch brd@(Board cols clr) cutDepth =
     let movesLeft = availableMoves brd
     in case (newCheckWinner brd) of 
             Just outcome -> if outcome == YesWinner clr 
-                            then 60 
+                            then addPlayerSign clr 60 
                             else if outcome == Tie 
                                  then 0 
-                                 else -60
+                                 else addPlayerSign (swapColor clr) 60
             Nothing -> if cutDepth == 0 
                        then evaluate brd
                        else maximum [cutOffSearch (updateBoard brd x) (cutDepth - 1) |x <- movesLeft]
-                       --maximum won't work when scores are fixed, because then highest score for black would be -60
+--maximum won't work when scores are fixed, because then highest score for black would be -60
 
---search for a move that forces the game to the best board state within the cut-off depth
 
 cutOffBestMove :: Board -> Int -> Maybe Move
 cutOffBestMove brd@(Board cols clr) depth = 
@@ -46,26 +45,29 @@ cutOffBestMove brd@(Board cols clr) depth =
         possibleOutcomes = [(cutOffSearch (updateBoard (Board cols clr) x) depth, x) |x <- possibleMvs]
         --if there are no possible moves (could be a tie), return nothing 
         --isTrue = foldr (\x y -> if(fst x == YesWinner clr) then True else y) False possibleOutcomes
-    in bestMoveFor possibleOutcomes --just fold to return the move with the highest score
-    where bestMoveFor :: [(Score, Move)] -> Maybe Move
-          bestMoveFor outs =
-                case lookup 60 outs of 
+    in bestMoveFor possibleOutcomes clr --just fold to return the move with the highest score
+    where bestMoveFor :: [(Score, Move)] -> Color -> Maybe Move
+          bestMoveFor outs colr =
+                case lookup (addPlayerSign colr 60) outs of 
                   Just move -> Just move
                   Nothing -> snd (foldl (\acc (x,y) -> if x > fst acc 
                                               then (x, Just y)
-                                              else acc ) (-60, Nothing) outs)
+                                              else acc ) ((addPlayerSign (swapColor colr) 60), Nothing) outs)
                     
-
+addPlayerSign :: Color -> Score -> Int
+addPlayerSign Red scr = scr;
+addPlayerSign Black scr = -scr;
+--Signs are fixed for scores. Red's highest score is 60, and Black's highest score is -60
 evaluate :: Board -> Int 
 evaluate brd@(Board cols clr) =
     let isWonByOne = newCheckWinner brd
         oppClr = swapColor clr
     in if isWonByOne == Just (YesWinner clr) 
-       then 60
+       then addPlayerSign clr 60 --returns max for the color being checked
        else if isWonByOne == Just Tie 
             then 0
             else if newCheckWinner (Board cols oppClr) == Just (YesWinner oppClr) 
-                 then -60
+                 then addPlayerSign oppClr 60--returns the max for the other color (opponent)
                 else findBoardScore brd
     where findBoardScore :: Board -> Int
           findBoardScore brd@(Board cols clr) = 
@@ -74,9 +76,9 @@ evaluate brd@(Board cols clr) =
                 scoreOne = sum [ countAllDirs brd (length (getColumn brd x), x)  | x <- [1..7]]
                 scoreTwo = sum [ countAllDirs oppBoard (length (getColumn oppBoard x), x)  | x <- [1..7]]
             in if scoreOne > scoreTwo 
-               then scoreOne
+               then addPlayerSign clr scoreOne
                else if scoreTwo > scoreOne 
-                    then -scoreTwo
+                    then addPlayerSign oppClr scoreTwo
                     else 0
           countAllDirs :: Board -> Coordinate -> Int
           countAllDirs brd@(Board cols clr) coord =
