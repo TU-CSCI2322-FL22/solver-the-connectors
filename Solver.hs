@@ -228,7 +228,7 @@ chooseAction flags bd
 tellMoveWithCutOffDepth :: Board -> [Flag] -> IO ()
 tellMoveWithCutOffDepth bd flags = do
     let gd = getDepth flags
-    let Just x = cutOffBestMove bd gd
+    let Just x = cutOffBestMove bd gd --Maybe it's upset because it assumes x will be something and it doesn't account for if it's nothing?
     if (Verbose `elem` flags) 
     then putStrLn("The best move is " ++ show(x) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
     else putStrLn ("The best move is " ++ show(x) ++ ".")
