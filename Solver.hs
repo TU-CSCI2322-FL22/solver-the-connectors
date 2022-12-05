@@ -231,7 +231,7 @@ tellMoveWithCutOffDepth bd flags = do
     case cutOffBestMove bd gd of 
         Nothing -> putStrLn ("There is no best move.")
         Just x -> if (Verbose `elem` flags) 
-                  then putStrLn("The best move is " ++ show(x) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
+                  then putStrLn("The best move is " ++ show(x) ++ ". The rating of the board after making this move is " ++ show(evaluate(updateBoard bd x)) ++ ".")
                   else putStrLn ("The best move is " ++ show(x) ++ ".")
 
 tellBestMove :: Board -> [Flag] -> IO ()
@@ -239,7 +239,7 @@ tellBestMove bd flags = do
     case bestMove bd of 
         Nothing -> putStrLn("No best move.")
         Just x -> if (Verbose `elem` flags)
-                  then putStrLn("The best move is " ++ show(x) ++ ". The rating of the move is " ++ show(evaluate(bd)) ++ ".")
+                  then putStrLn("The best move is " ++ show(x) ++ ". The rating of the board after making this move is " ++ show(evaluate(updateBoard bd x)) ++ ".")
                   else putStrLn("TBM The best move is " ++ show(x) ++ ".")
         
 
