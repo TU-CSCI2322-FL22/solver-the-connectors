@@ -280,9 +280,8 @@ bM7 = bestMove (Board [[Black, Red, Black, Red, Red,Red], [Red, Black, Red, Blac
 
 
 --Boards--
-dominatedByRed = putStrLn (showBoard (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red))
-dBR = writeGame (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) "TestDominatedByRed.hs"
-
+dominatedByBlack = putStrLn (showBoard (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red))
+dBB = writeGame (Board [[Black, Black,Red,Black,Black],[Black, Red, Red, Black,Black, Red], [Black, Red,Black, Red], [Red, Red,Black, Red,Red,Black], [Black,Black,Red,Black, Red], [Black, Red, Black, Red,Black, Red],[Black,Red,Black,Black,Black]] Red) "TestDominatedByBlack.hs"
 
 nearStart = putStrLn (showBoard(Board [[Black],[Red, Black], [Red, Black, Red], [Black, Red], [Red, Black], [Red, Red], [Black,Black]] Red))
 nS = writeGame (Board [[Black],[Red, Black], [Red, Black, Red], [Black, Red], [Red, Black], [Red, Red], [Black,Black]] Red) "TestNearStart.hs"
