@@ -155,7 +155,7 @@ charToColor '0' = Red
 
 readGame :: String -> Board 
 readGame str = 
-    let clr = charToColor(head(str))
+    let clr = charToColor(head(str)) --makes color head of str of file 
         clmString = tail(str)
         newlst = (splitOn "\n" clmString)
         clmslst = reverse(tail (reverse (foldr( \x y -> [charToColor g | g <- x]:y) [] newlst)))
@@ -180,7 +180,7 @@ loadGame fp = do
 
 putWinner :: Board -> IO ()
 putWinner bd = 
-    let winner = checkWinner bd Red (1,1)
+    let winner = newCheckWinner bd
     in putStrLn("The winner is " ++ aux(winner))
     where 
         aux :: Maybe Winner -> String
