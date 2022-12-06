@@ -52,7 +52,7 @@ cutOffBestMove brd@(Board cols clr) depth =
                   Just move -> Just move
                   Nothing -> snd (foldl (\acc (x,y) -> if x > fst acc 
                                               then (x, Just y)
-                                              else acc ) ((addPlayerSign (swapColor colr) 100), Just 0) outs)
+                                              else acc ) ((addPlayerSign (swapColor colr) 100), Nothing) outs)
                     
 addPlayerSign :: Color -> Score -> Int
 addPlayerSign Red scr = scr;
@@ -237,7 +237,7 @@ tellMoveWithCutOffDepth bd flags = do
 tellBestMove :: Board -> [Flag] -> IO ()
 tellBestMove bd flags = do
     case bestMove bd of 
-        Nothing -> putStrLn("No best move.")
+        Nothing -> putStrLn("No best move.")--check for winner here
         Just x -> if (Verbose `elem` flags)
                   then putStrLn("The best move is " ++ show(x) ++ ". The rating of the board after making this move is " ++ show(evaluate(updateBoard bd x)) ++ ".")
                   else putStrLn("TBM The best move is " ++ show(x) ++ ".")
