@@ -50,9 +50,8 @@ cutOffBestMove brd@(Board cols clr) depth =
           bestMoveFor outs colr =
                 case lookup (addPlayerSign colr 100) outs of 
                   Just move -> Just move
-                  Nothing -> snd (foldl (\acc (x,y) -> if x > fst acc 
-                                              then (x, Just y)
-                                              else acc ) ((addPlayerSign (swapColor colr) 100), Nothing) outs)
+                  Nothing -> if colr == Red then snd (foldl (\acc (x,y) -> if x > fst acc then (x, Just y) else acc ) (-100, Nothing) outs)
+                             else snd (foldl (\acc (x,y) -> if x < fst acc then (x, Just y) else acc ) (100, Nothing) outs)
                     
 addPlayerSign :: Color -> Score -> Int
 addPlayerSign Red scr = scr;
