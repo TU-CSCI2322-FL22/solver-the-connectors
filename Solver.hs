@@ -82,7 +82,7 @@ evaluate brd@(Board cols clr) =
                     else 0
           countAllDirs :: Board -> Coordinate -> Int
           countAllDirs brd@(Board cols clr) coord =
-            let dirs = [(-1,1),(1,1),(-1,0),(0,1)]--rtDsc, rtAsc, down, right
+            let dirs = [(-1,1),(-1,-1),(-1,0),(0,1)]--rtDsc, lfDsc, down, right
             in sum [dirCounter brd coord x | x <- dirs]
             
  --Evaluate will take a board. It will check if either color has one the game, then it
