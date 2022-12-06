@@ -229,7 +229,9 @@ tellMoveWithCutOffDepth :: Board -> [Flag] -> IO ()
 tellMoveWithCutOffDepth bd flags = do
     let gd = getDepth flags
     case cutOffBestMove bd gd of 
-        Nothing -> putStrLn ("There is no best move.")
+        Nothing -> case newCheckWinner bd of
+                      Nothing -> putStrLn ("There is no best move.")
+                      Just x -> putStrLn ("There is not best move because " ++ show(x) ++ " has won.")
         Just x -> if (Verbose `elem` flags) 
                   then putStrLn("The best move is " ++ show(x) ++ ". The rating of the board after making this move is " ++ show(evaluate(updateBoard bd x)) ++ ".")
                   else putStrLn ("The best move is " ++ show(x) ++ ".")
@@ -237,10 +239,12 @@ tellMoveWithCutOffDepth bd flags = do
 tellBestMove :: Board -> [Flag] -> IO ()
 tellBestMove bd flags = do
     case bestMove bd of 
-        Nothing -> putStrLn("No best move.")--check for winner here
+        Nothing -> case newCheckWinner bd of
+                      Nothing -> putStrLn ("There is no best move.")
+                      Just x -> putStrLn ("There is not best move because " ++ show(x) ++ " has won.")
         Just x -> if (Verbose `elem` flags)
                   then putStrLn("The best move is " ++ show(x) ++ ". The rating of the board after making this move is " ++ show(evaluate(updateBoard bd x)) ++ ".")
-                  else putStrLn("TBM The best move is " ++ show(x) ++ ".")
+                  else putStrLn("The best move is " ++ show(x) ++ ".")
         
 
 makeAndTellMove :: Board -> [Flag] -> IO ()
@@ -290,8 +294,14 @@ evenMatch = putStrLn (showBoard (Board [[Red,Red,Black,Black], [Black, Black, Re
 eMa = writeGame (Board [[Red,Red,Black,Black], [Black, Black, Red, Red], [Red,Red,Black, Black], [Black, Black,Red,Red], [Red,Red,Black,Black], [Black, Black, Red, Red], [Red, Red, Black, Black]] Red) "TestEvenMatch.hs"
 
 nearEnd = putStrLn (showBoard (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black))
-nE = writeGame (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black) "TestNearEnd.hs"
+nE = writeGame (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black) "TestNearEnd2.hs"
+pne = availableMoves (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black)
 
+atLastMove = putStrLn (showBoard (Board [[Black,Red,Red, Black, Black], [Red, Black, Black, Red, Black], [Black,Red,Red, Black, Black], [Red, Black, Black, Red, Red], [Black,Red,Red, Black, Red], [Red, Black, Black, Red, Red], [Black,Red,Red, Black]] Black))
+aLM = writeGame (Board [[Black,Red,Red, Black, Black], [Red, Black, Black, Red, Black], [Black,Red,Red, Black, Black], [Red, Black, Black, Red, Red], [Black,Red,Red, Black, Red], [Red, Black, Black, Red, Red], [Black,Red,Red, Black]] Black) "TestAtLastMove.hs"
+
+withWinner = putStrLn (showBoard (Board [[Black,Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red,Black, Black, Red],[Red,Red,Red,Black], [Black,Black,Black, Red], [Black, Red, Red,Red, Black], [Black, Red, Red, Black, Black]] Red))
+wWinner = writeGame (Board [[Black,Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red,Black, Black, Red],[Red,Red,Red,Black], [Black,Black,Black, Red], [Black, Red, Red,Red, Black], [Black, Red, Red, Black, Black]] Red) "TestWithWinner.hs"
 
 --IO Tests--
 ca = chooseAction [Move "2"] (Board [[Black,Black,Black, Red], [Red, Red, Red, Black, Black], [Red, Black,Black, Red], [Red, Red, Red,Black, Red], [Black,Black,Black,Red], [Black,Red,Red,Red, Black], []] Black)
