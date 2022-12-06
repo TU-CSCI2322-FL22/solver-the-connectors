@@ -29,10 +29,10 @@ cutOffSearch brd@(Board cols clr) cutDepth =
     let movesLeft = availableMoves brd
     in case (newCheckWinner brd) of 
             Just outcome -> if outcome == YesWinner clr 
-                            then addPlayerSign clr 60 
+                            then addPlayerSign clr 100 
                             else if outcome == Tie 
                                  then 0 
-                                 else addPlayerSign (swapColor clr) 60
+                                 else addPlayerSign (swapColor clr) 100
             Nothing -> if cutDepth == 0 
                        then evaluate brd
                        else maximum [cutOffSearch (updateBoard brd x) (cutDepth - 1) |x <- movesLeft]
@@ -48,11 +48,11 @@ cutOffBestMove brd@(Board cols clr) depth =
     in bestMoveFor possibleOutcomes clr --just fold to return the move with the highest score
     where bestMoveFor :: [(Score, Move)] -> Color -> Maybe Move
           bestMoveFor outs colr =
-                case lookup (addPlayerSign colr 60) outs of 
+                case lookup (addPlayerSign colr 100) outs of 
                   Just move -> Just move
                   Nothing -> snd (foldl (\acc (x,y) -> if x > fst acc 
                                               then (x, Just y)
-                                              else acc ) ((addPlayerSign (swapColor colr) 60), Nothing) outs)
+                                              else acc ) ((addPlayerSign (swapColor colr) 100), Nothing) outs)
                     
 addPlayerSign :: Color -> Score -> Int
 addPlayerSign Red scr = scr;
@@ -63,11 +63,11 @@ evaluate brd@(Board cols clr) =
     let isWonByOne = newCheckWinner brd
         oppClr = swapColor clr
     in if isWonByOne == Just (YesWinner clr) 
-       then addPlayerSign clr 60 --returns max for the color being checked
+       then addPlayerSign clr 100 --returns max for the color being checked
        else if isWonByOne == Just Tie 
             then 0
             else if newCheckWinner (Board cols oppClr) == Just (YesWinner oppClr) 
-                 then addPlayerSign oppClr 60--returns the max for the other color (opponent)
+                 then addPlayerSign oppClr 100--returns the max for the other color (opponent)
                 else findBoardScore brd
     where findBoardScore :: Board -> Int
           findBoardScore brd@(Board cols clr) = 
